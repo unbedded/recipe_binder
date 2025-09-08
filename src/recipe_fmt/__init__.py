@@ -1,5 +1,4 @@
-"""
-recipe_fmt - Python package following CLAUDE.md standards.
+"""recipe_fmt - Python package following CLAUDE.md standards.
 
 This package provides [brief description of functionality].
 """

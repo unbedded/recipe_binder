@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-<DATE>2025-09-08</DATE>
+"""<DATE>2025-09-08</DATE>
 
 Module scaffolding tool following CLAUDE.md standards.
 
@@ -18,56 +17,54 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class ModuleScaffolder:
-    """
-    Generates Python modules following CLAUDE.md standards.
-    
+    """Generates Python modules following CLAUDE.md standards.
+
     This class creates properly structured Python modules with consistent
     patterns for logging, configuration management, error handling, and
     documentation as defined in the project standards.
     """
-    
-    def __init__(self, cfg_dict: Optional[Dict[str, Any]] = None) -> None:
-        """
-        Initialize the module scaffolder.
-        
+
+    def __init__(self, cfg_dict: dict[str, Any] | None = None) -> None:
+        """Initialize the module scaffolder.
+
         Args:
             cfg_dict: Configuration dictionary with scaffolding settings
         """
         # STEP_1: Initialize logging first
         self.logger = logging.getLogger(__name__)
-        
+
         # STEP_2: Configuration management
         self.cfg_dict = self._apply_config_defaults(cfg_dict or {})
-        
+
         self.logger.info("ModuleScaffolder initialized with config: %s", self.cfg_dict)
-    
-    def _apply_config_defaults(self, cfg_dict: Dict[str, Any]) -> Dict[str, Any]:
+
+    def _apply_config_defaults(self, cfg_dict: dict[str, Any]) -> dict[str, Any]:
         """Apply configuration defaults and log missing keys."""
         defaults = {
             "src_dir": "src",
-            "test_dir": "tests", 
+            "test_dir": "tests",
             "package_name": "__PKG__",  # Will be replaced by bootstrap
             "author": "Your Name",
             "create_tests": True,
             "include_main": False,
         }
-        
+
         for key, default_value in defaults.items():
             if key not in cfg_dict:
                 cfg_dict[key] = default_value
                 self.logger.debug("Applied default for missing key %s: %s", key, default_value)
-        
+
         return cfg_dict
-    
-    def get_cfg(self) -> Dict[str, Any]:
+
+    def get_cfg(self) -> dict[str, Any]:
         """Return current configuration dictionary."""
         return self.cfg_dict.copy()
-    
-    def set_cfg(self, cfg_dict: Dict[str, Any]) -> None:
+
+    def set_cfg(self, cfg_dict: dict[str, Any]) -> None:
         """Update configuration with new values."""
         for key, value in cfg_dict.items():
             if key in self.cfg_dict:
@@ -76,24 +73,23 @@ class ModuleScaffolder:
                 self.logger.info("Updated config %s: %s -> %s", key, old_value, value)
             else:
                 self.logger.warning("Unknown config key ignored: %s", key)
-    
+
     def generate_module_content(self, module_name: str, class_name: str) -> str:
-        """
-        Generate module content following CLAUDE.md standards.
-        
+        """Generate module content following CLAUDE.md standards.
+
         Args:
             module_name: Name of the module (snake_case)
             class_name: Name of the main class (PascalCase)
-            
+
         Returns:
             Complete module source code
         """
         today = datetime.now().strftime("%Y-%m-%d")
-        
+
         template = f'''"""
 <DATE>{today}</DATE>
 
-{class_name} module for handling {module_name.replace('_', ' ')} operations.
+{class_name} module for handling {module_name.replace("_", " ")} operations.
 
 This module provides {class_name} class with comprehensive configuration
 management, logging, and error handling following CLAUDE.md standards.
@@ -112,7 +108,7 @@ from typing import Any, Dict, List, Optional
 
 class {class_name}:
     """
-    Handles {module_name.replace('_', ' ')} operations with configuration management.
+    Handles {module_name.replace("_", " ")} operations with configuration management.
     
     This class provides a template for implementing business logic while
     following CLAUDE.md standards for logging, configuration, and error
@@ -280,20 +276,19 @@ class {class_name}:
 '''
 
         return template
-    
+
     def generate_test_content(self, module_name: str, class_name: str) -> str:
-        """
-        Generate test file content for the module.
-        
+        """Generate test file content for the module.
+
         Args:
             module_name: Name of the module being tested
             class_name: Name of the class being tested
-            
+
         Returns:
             Complete test file source code
         """
         today = datetime.now().strftime("%Y-%m-%d")
-        
+
         template = f'''"""
 <DATE>{today}</DATE>
 
@@ -509,55 +504,56 @@ class Test{class_name}Performance:
 '''
 
         return template
-    
+
     def create_module(self, module_name: str, include_tests: bool = True) -> bool:
-        """
-        Create a new module with optional tests.
-        
+        """Create a new module with optional tests.
+
         Args:
             module_name: Name of the module to create (snake_case)
             include_tests: Whether to create test file
-            
+
         Returns:
             True if creation succeeded
         """
         self.logger.info("Creating module: %s (include_tests=%s)", module_name, include_tests)
-        
+
         # Validate module name
         if not module_name.isidentifier() or not module_name.islower():
-            error_msg = f"Invalid module name: {module_name}. Must be valid Python identifier in snake_case"
+            error_msg = (
+                f"Invalid module name: {module_name}. Must be valid Python identifier in snake_case"
+            )
             self.logger.error(error_msg)
             raise ValueError(error_msg)
-        
+
         # Generate class name (PascalCase)
-        class_name = ''.join(word.capitalize() for word in module_name.split('_'))
-        
+        class_name = "".join(word.capitalize() for word in module_name.split("_"))
+
         try:
             # Create module file
             src_dir = Path(self.cfg_dict["src_dir"]) / self.cfg_dict["package_name"]
             src_dir.mkdir(parents=True, exist_ok=True)
-            
+
             module_file = src_dir / f"{module_name}.py"
             module_content = self.generate_module_content(module_name, class_name)
             module_file.write_text(module_content)
-            
+
             self.logger.info("Created module file: %s", module_file)
             print(f"✅ Created module: {module_file}")
-            
+
             # Create test file if requested
             if include_tests:
                 test_dir = Path(self.cfg_dict["test_dir"])
                 test_dir.mkdir(parents=True, exist_ok=True)
-                
+
                 test_file = test_dir / f"test_{module_name}.py"
                 test_content = self.generate_test_content(module_name, class_name)
                 test_file.write_text(test_content)
-                
+
                 self.logger.info("Created test file: %s", test_file)
                 print(f"✅ Created test file: {test_file}")
-            
+
             return True
-            
+
         except Exception as e:
             error_msg = f"Failed to create module {module_name}: {e}"
             self.logger.exception(error_msg)
@@ -573,7 +569,7 @@ def setup_logging() -> None:
         handlers=[
             logging.StreamHandler(sys.stdout),
             logging.FileHandler(".claude/tools/module_scaffold.log", mode="a"),
-        ]
+        ],
     )
 
 
@@ -581,7 +577,7 @@ def main() -> int:
     """Main entry point for command-line usage."""
     setup_logging()
     logger = logging.getLogger(__name__)
-    
+
     parser = argparse.ArgumentParser(
         description="Generate Python modules following CLAUDE.md standards",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -590,45 +586,35 @@ Examples:
   python .claude/tools/module_scaffold.py user_manager
   python .claude/tools/module_scaffold.py auth_service --tests
   python .claude/tools/module_scaffold.py data_processor --no-tests
-        """
+        """,
     )
-    
-    parser.add_argument(
-        "module_name",
-        help="Name of the module to create (snake_case)"
-    )
-    
+
+    parser.add_argument("module_name", help="Name of the module to create (snake_case)")
+
     parser.add_argument(
         "--tests",
         action="store_true",
         dest="include_tests",
         default=True,
-        help="Create test file (default: True)"
+        help="Create test file (default: True)",
     )
-    
+
     parser.add_argument(
-        "--no-tests",
-        action="store_false",
-        dest="include_tests",
-        help="Do not create test file"
+        "--no-tests", action="store_false", dest="include_tests", help="Do not create test file"
     )
-    
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable verbose logging"
-    )
-    
+
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+
     args = parser.parse_args()
-    
+
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    
+
     try:
         scaffolder = ModuleScaffolder()
         success = scaffolder.create_module(args.module_name, args.include_tests)
         return 0 if success else 1
-        
+
     except Exception as e:
         logger.error("Module scaffolding failed: %s", e)
         print(f"Error: {e}", file=sys.stderr)

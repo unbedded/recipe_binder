@@ -10,7 +10,6 @@ Example usage:
     pytest tests/test_recipe_fmt.py -v
 """
 
-import pytest
 from recipe_fmt import __version__
 
 
@@ -24,19 +23,21 @@ def test_version():
 def test_package_import():
     """Test that package can be imported successfully."""
     import recipe_fmt
+
     assert recipe_fmt is not None
 
 
 class TestSanity:
     """Sanity test suite to ensure basic functionality."""
-    
+
     def test_basic_functionality(self):
         """Test basic package functionality."""
         # Add your basic functionality tests here
         assert True  # Placeholder test
-    
+
     def test_environment_setup(self):
-        """Test that development environment is properly configured.""" 
+        """Test that development environment is properly configured."""
         # Test that required dependencies are available
         import sys
+
         assert sys.version_info >= (3, 13)  # Minimum Python version
