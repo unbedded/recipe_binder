@@ -3,10 +3,10 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "__PKG__"
+name = "recipe_fmt"
 dynamic = ["version"]
 description = "Python project template for Claude Code development"
-authors = [{name = "Your Name", email = "your.email@example.com"}]
+authors = [{name = "Spencer Barrett", email = "your.email@example.com"}]
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.13"
@@ -17,7 +17,15 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
 ]
-dependencies = []
+dependencies = [
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "openai>=1.0",
+    "reportlab>=3.6",
+    "PyYAML>=6.0",
+    "pathlib-mate>=1.0",
+    "typing-extensions>=4.0",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -30,9 +38,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/__PKG__"
-Repository = "https://github.com/yourusername/__PKG__.git"
-Issues = "https://github.com/yourusername/__PKG__/issues"
+Homepage = "https://github.com/yourusername/recipe_fmt"
+Repository = "https://github.com/yourusername/recipe_fmt.git"
+Issues = "https://github.com/yourusername/recipe_fmt/issues"
 
 [tool.setuptools.dynamic]
 version = {file = "VERSION"}
@@ -70,7 +78,7 @@ omit = [
 ]
 
 [tool.ruff]
-target-version = "__RUFF_TARGET__"
+target-version = "py313"
 line-length = 100
 fix = true
 
@@ -100,7 +108,7 @@ convention = "google"
 "__init__.py" = ["D104"]
 
 [tool.mypy]
-python_version = "__MYPY_PY_VERSION__"
+python_version = "3.13"
 ignore_missing_imports = true
 strict = true
 warn_return_any = true
