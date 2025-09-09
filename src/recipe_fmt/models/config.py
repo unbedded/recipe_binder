@@ -85,9 +85,20 @@ class AppConfig(BaseSettings):
     log_level: str = Field("WARNING", description="Logging level")
     
     # Component configurations
-    display: DisplayConfig = Field(default_factory=DisplayConfig)
-    openai: OpenAIConfig = Field(default_factory=OpenAIConfig)
-    template: TemplateConfig = Field(default_factory=TemplateConfig)
+    display: Optional[DisplayConfig] = Field(None, description="Display configuration")
+    openai: Optional[OpenAIConfig] = Field(None, description="OpenAI configuration")
+    template: Optional[TemplateConfig] = Field(None, description="Template configuration")
+    
+    def __init__(self, **kwargs):
+        """Initialize with sub-configs to avoid env variable conflicts."""
+        # Initialize nested configs separately to avoid env parsing conflicts
+        if 'display' not in kwargs:
+            kwargs['display'] = DisplayConfig()
+        if 'openai' not in kwargs:
+            kwargs['openai'] = OpenAIConfig()  
+        if 'template' not in kwargs:
+            kwargs['template'] = TemplateConfig()
+        super().__init__(**kwargs)
     
     @field_validator('log_level')
     def validate_log_level(cls, v: str) -> str:
