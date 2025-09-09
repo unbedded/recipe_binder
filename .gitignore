@@ -73,3 +73,7 @@ dmypy.json
 
 # Ruff
 .ruff_cache/
+
+# Recipe Binder - Generated files (keep source markdown for demos)
+recipe/yaml/
+recipe/pdf/
