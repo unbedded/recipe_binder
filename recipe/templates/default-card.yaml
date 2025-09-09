@@ -1,0 +1,237 @@
+# Default Recipe Card Template
+# This template defines the layout and styling for recipe cards
+
+template_info:
+  name: "Default Recipe Card"
+  version: "1.0"
+  description: "Standard two-sided recipe card with category colors"
+  author: "Recipe Binder System"
+
+# Card specifications
+card:
+  size:
+    width: 8.5  # inches
+    height: 4.0  # inches
+    orientation: "landscape"
+  
+  margins:
+    top: 0.25     # inches
+    bottom: 0.25  # inches
+    left: 0.25    # inches
+    right: 0.25   # inches
+  
+  layout: "two_sided"  # two_sided, single_sided, ingredients_only, instructions_only
+
+# Typography settings
+typography:
+  title:
+    font_name: "Helvetica-Bold"
+    font_size: 18
+    alignment: "center"
+    color: "black"
+    space_after: 6
+  
+  category_banner:
+    font_name: "Helvetica-Bold"
+    font_size: 12
+    alignment: "center"
+    color: "white"
+    background: "category_color"  # Uses category-specific color
+    height: 0.3  # inches
+  
+  section_header:
+    font_name: "Helvetica-Bold"
+    font_size: 14
+    alignment: "left"
+    color: "black"
+    space_before: 8
+    space_after: 4
+  
+  metadata:
+    font_name: "Helvetica"
+    font_size: 9
+    alignment: "center"
+    color: "#666666"
+    space_after: 4
+  
+  description:
+    font_name: "Helvetica-Oblique"
+    font_size: 10
+    alignment: "center"
+    color: "black"
+    space_after: 6
+  
+  ingredient:
+    font_name: "Helvetica"
+    font_size: 9
+    alignment: "left"
+    color: "black"
+    space_after: 2
+  
+  instruction:
+    font_name: "Helvetica"
+    font_size: 10
+    alignment: "justify"
+    color: "black"
+    space_after: 3
+  
+  notes:
+    font_name: "Helvetica-Oblique"
+    font_size: 9
+    alignment: "left"
+    color: "#4D4D4D"
+    space_after: 2
+
+# Display options
+display:
+  show_weights: true
+  show_purpose: true
+  show_category_banner: true
+  show_metadata: true
+  show_description: true
+  show_notes: true
+  
+  # Ingredient table configuration
+  ingredients:
+    columns:
+      amount:
+        width: 0.8  # inches
+        alignment: "right"
+        label: "Amount"
+      unit:
+        width: 0.8  # inches
+        alignment: "right"
+        label: "Unit"
+      ingredient:
+        width: "auto"  # Uses remaining space
+        alignment: "left"
+        label: "Ingredient"
+      weight:
+        width: 0.8  # inches
+        alignment: "center"
+        label: "Weight"
+        format: "({weight}g)"
+        show_when: "show_weights"
+      purpose:
+        width: 0.8  # inches
+        alignment: "left"
+        label: "Purpose"
+        show_when: "show_purpose"
+    
+    styling:
+      alternating_rows: true
+      row_colors: ["#FFFFFF", "#F5F5F5"]
+      padding: 3
+      border: false
+
+# Color scheme (uses category colors from CategoryColors class)
+colors:
+  category_colors:
+    Meat: "#CC3333"        # Deep Red
+    Side: "#66CC66"        # Light Green
+    Main: "#3366CC"        # Royal Blue
+    Soup: "#FF9933"        # Orange
+    Sauce: "#9966CC"       # Purple
+    Breakfast: "#FFCC33"   # Golden Yellow
+    Salad: "#33CC33"       # Fresh Green
+    Baking: "#CC9966"      # Warm Brown
+    Dessert: "#CC6699"     # Pink
+    Other: "#999999"       # Gray
+  
+  # Additional color definitions
+  text:
+    primary: "#000000"
+    secondary: "#666666"
+    light: "#999999"
+  
+  background:
+    primary: "#FFFFFF"
+    alternate: "#F5F5F5"
+    banner: "category_color"
+
+# Layout sections for two-sided cards
+layout_sections:
+  front_side:
+    sections:
+      - type: "category_banner"
+        height: 0.3  # inches
+      - type: "title"
+        height: "auto"
+      - type: "metadata"
+        height: "auto"
+        show_when: "show_metadata"
+      - type: "description"
+        height: "auto"
+        show_when: "show_description"
+      - type: "spacer"
+        height: 0.1  # inches
+      - type: "ingredients"
+        height: "remaining"
+  
+  back_side:
+    sections:
+      - type: "category_banner"
+        height: 0.2  # inches (smaller on back)
+      - type: "spacer"
+        height: 0.1  # inches
+      - type: "instructions"
+        height: "auto"
+      - type: "spacer"
+        height: 0.1  # inches
+        show_when: "show_notes"
+      - type: "notes"
+        height: "auto"
+        show_when: "show_notes"
+
+# Single-sided layout (alternative)
+single_sided_layout:
+  columns: 2
+  column_split: 0.5  # 50/50 split
+  
+  left_column:
+    - type: "ingredients"
+      height: "remaining"
+  
+  right_column:
+    - type: "instructions"
+      height: "auto"
+    - type: "spacer"
+      height: 0.1  # inches
+      show_when: "show_notes"
+    - type: "notes"
+      height: "auto"
+      show_when: "show_notes"
+  
+  header:
+    - type: "category_banner"
+      height: 0.3  # inches
+    - type: "title"
+      height: "auto"
+    - type: "metadata"
+      height: "auto"
+      show_when: "show_metadata"
+    - type: "description"
+      height: "auto"
+      show_when: "show_description"
+    - type: "spacer"
+      height: 0.1  # inches
+
+# Advanced customization options
+advanced:
+  page_numbering: false
+  watermark: false
+  crop_marks: false
+  bleed: 0  # inches
+  
+  # Quality settings
+  image_dpi: 300
+  text_rendering: "high_quality"
+  compression: true
+  
+  # Accessibility
+  pdf_version: "1.4"
+  tagged_pdf: false
+  
+  # Print settings
+  print_scaling: "none"
+  duplex: "short_edge"  # For two-sided printing
