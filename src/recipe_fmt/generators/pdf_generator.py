@@ -139,8 +139,53 @@ class PDFCardGenerator:
         self._init_card_specs()
         self._init_typography()
         
+        # STEP_5: Font sizing thresholds for adaptive sizing
+        self.min_font_size = 5  # Minimum readable font size (lowered to handle dense content)
+        # Get default font sizes from template (will be loaded in _load_template_defaults)
+        self.default_table_font = 9  # fallback
+        self.default_instruction_font = 10  # fallback
+        # Height estimation safety buffers (loaded from template)
+        self.table_safety_buffer = 1.3  # fallback
+        self.paragraph_safety_buffer = 1.2  # fallback
+        self._load_template_defaults()
+        
         self.logger.info("PDFCardGenerator initialized - size: %.1f×%.1f, weights: %s", 
                         self.card_width, self.card_height, config.show_weights)
+    
+    def _load_template_defaults(self) -> None:
+        """Load default font sizes and settings from template configuration."""
+        try:
+            from pathlib import Path
+            import yaml
+            
+            template_path = Path("recipe/templates/default-card.yaml")
+            if template_path.exists():
+                with open(template_path, 'r') as f:
+                    template_config = yaml.safe_load(f)
+                
+                # Extract font sizes from template
+                typography = template_config.get('typography', {})
+                
+                ingredient_font = typography.get('ingredient', {}).get('font_size', 9)
+                instruction_font = typography.get('instruction', {}).get('font_size', 10)
+                
+                self.default_table_font = ingredient_font
+                self.default_instruction_font = instruction_font
+                
+                # Load height estimation buffers
+                advanced = template_config.get('advanced', {})
+                height_estimation = advanced.get('height_estimation', {})
+                
+                self.table_safety_buffer = height_estimation.get('table_safety_buffer', 1.3)
+                self.paragraph_safety_buffer = height_estimation.get('paragraph_safety_buffer', 1.2)
+                
+                self.logger.debug("Loaded template settings: ingredient=%d, instruction=%d, buffers=%.1f/%.1f", 
+                                ingredient_font, instruction_font, self.table_safety_buffer, self.paragraph_safety_buffer)
+            else:
+                self.logger.debug("Template file not found, using fallback font sizes")
+                
+        except Exception as e:
+            self.logger.warning("Failed to load template defaults: %s", e)
     
     def _apply_config_defaults(self, cfg_dict: dict) -> dict:
         """Apply configuration defaults and log missing keys.
@@ -464,6 +509,84 @@ class PDFCardGenerator:
         
         return story
     
+    def _calculate_available_height(self, has_banner: bool = True, page_num: int = 1) -> float:
+        """Calculate available height on a page after margins and fixed elements.
+        
+        Args:
+            has_banner: Whether page has a banner
+            page_num: Page number (1 for front, 2 for back)
+            
+        Returns:
+            Available height in points
+        """
+        available_height = self.content_height
+        
+        # Subtract banner height if present
+        if has_banner:
+            available_height -= self.banner_height
+            available_height -= self.spacing/2  # Banner spacing
+        
+        # Subtract typical spacers between sections
+        if page_num == 1:
+            # Front page: banner + ingredients + description spacing
+            available_height -= self.spacing  # Additional spacing
+        else:
+            # Back page: banner + instructions + notes spacing
+            available_height -= self.spacing/2
+        
+        return max(available_height, 1*inch)  # Ensure minimum space
+    
+    def _measure_table_height(self, table_data: list, col_widths: list, font_size: int = 9) -> float:
+        """Estimate height of a table with given data and styling.
+        
+        Args:
+            table_data: List of table rows
+            col_widths: Column width specifications
+            font_size: Font size for table text
+            
+        Returns:
+            Estimated table height in points
+        """
+        if not table_data:
+            return 0
+        
+        # Estimate row height: font_size + padding + line spacing
+        row_height = font_size + 2  # 1pt top + 1pt bottom padding
+        
+        # Add safety buffer for multi-line cells and measurement errors
+        estimated_height = len(table_data) * row_height * self.table_safety_buffer
+        
+        return estimated_height
+    
+    def _measure_paragraph_height(self, text: str, style_name: str, width: float, font_size: int = None) -> float:
+        """Estimate height of a paragraph with given text and style.
+        
+        Args:
+            text: Text content
+            style_name: Name of paragraph style to use
+            width: Available width for text
+            font_size: Override font size (if None, uses style default)
+            
+        Returns:
+            Estimated paragraph height in points
+        """
+        if not text:
+            return 0
+        
+        # Use provided font size or get from style
+        if font_size is None:
+            style = self.styles.get(style_name, self.styles['Normal'])
+            font_size = getattr(style, 'fontSize', 10)
+        
+        # Rough estimation: characters per line * lines needed
+        chars_per_line = width / (font_size * 0.6)  # Approximate character width
+        lines_needed = max(1, len(text) / chars_per_line)
+        
+        line_height = font_size * 1.2  # Include line spacing
+        
+        # Add safety buffer to prevent overflow
+        return lines_needed * line_height * self.paragraph_safety_buffer
+    
     def _build_back_side(self, recipe: Recipe) -> list:
         """Build back side content (compact serves/time + instructions + notes).
         
@@ -686,42 +809,78 @@ class PDFCardGenerator:
         
         # STEP_25: No section header for compact format
         
-        # STEP_26: Build compact ingredients table
-        table_width = max_width or self.content_width
+        # STEP_26: Build compact ingredients table with dynamic width
         ingredients_data = []
         
         show_weights = self.config.show_weights
         show_purpose = any(ing.purpose for ing in recipe.ingredients)
         
-        # Determine column structure - make units closer to amounts
-        if show_weights and show_purpose:
-            # Amount+Unit | Ingredient | Weight | Purpose
-            col_widths = [1.2*inch, table_width-2.8*inch, 0.8*inch, 0.8*inch]
-        elif show_weights:
-            # Amount+Unit | Ingredient | Weight
-            col_widths = [1.2*inch, table_width-2.0*inch, 0.8*inch]
-        elif show_purpose:
-            # Amount+Unit | Ingredient | Purpose
-            col_widths = [1.2*inch, table_width-2.0*inch, 0.8*inch]
-        else:
-            # Amount+Unit | Ingredient
-            col_widths = [1.2*inch, table_width-1.2*inch]
+        # Dynamic column widths based on content
+        # Calculate optimal widths by analyzing content
+        max_amount_width = 0.4*inch  # Start with minimum
+        max_unit_width = 0.3*inch
+        max_grams_width = 0.5*inch
+        max_purpose_width = 0.8*inch if show_purpose else 0
         
-        # STEP_27: Add ingredient rows with compact formatting
+        # Analyze content to determine optimal widths
         for ingredient in recipe.ingredients:
-            # Combine amount and unit for more compact display
+            # Amount width
             amount_str = str(ingredient.amount) if ingredient.amount != int(ingredient.amount) else str(int(ingredient.amount))
-            amount_unit = f"{amount_str} {ingredient.unit}"
+            amount_width = len(amount_str) * 0.08*inch + 0.2*inch
+            max_amount_width = max(max_amount_width, amount_width)
+            
+            # Unit width
+            unit = ingredient.unit
+            if unit.lower() in ['cup', 'cups']:
+                unit = 'cp'
+            elif unit.lower() in ['count']:
+                unit = 'cnt'
+            unit_width = len(unit) * 0.08*inch + 0.15*inch
+            max_unit_width = max(max_unit_width, unit_width)
+            
+            # Grams width
+            if ingredient.weight_grams:
+                grams_str = f"{ingredient.weight_grams}g"
+                grams_width = len(grams_str) * 0.08*inch + 0.15*inch
+                max_grams_width = max(max_grams_width, grams_width)
+            
+            # Purpose width
+            if show_purpose and ingredient.purpose:
+                purpose_width = len(ingredient.purpose) * 0.08*inch + 0.2*inch
+                max_purpose_width = max(max_purpose_width, min(purpose_width, 1.2*inch))
+        
+        # Calculate ingredient name width based on actual content
+        max_ingredient_width = 1.0*inch  # Minimum width
+        for ingredient in recipe.ingredients:
+            ingredient_width = len(ingredient.ingredient) * 0.08*inch + 0.3*inch
+            max_ingredient_width = max(max_ingredient_width, ingredient_width)
+        
+        # Build column widths: Amount | Unit | Grams | Ingredient | Purpose (all minimum needed)
+        col_widths = [max_amount_width, max_unit_width, max_grams_width, max_ingredient_width]
+        if show_purpose:
+            col_widths.append(max_purpose_width)
+        
+        # Calculate actual table width needed
+        actual_table_width = sum(col_widths)
+        
+        # STEP_27: Add ingredient rows with updated formatting
+        for ingredient in recipe.ingredients:
+            # Convert unit abbreviations: cups → cp, count → cnt
+            unit = ingredient.unit
+            if unit.lower() in ['cup', 'cups']:
+                unit = 'cp'
+            elif unit.lower() in ['count']:
+                unit = 'cnt'
+            
+            # Format amount and separate unit and grams
+            amount_str = str(ingredient.amount) if ingredient.amount != int(ingredient.amount) else str(int(ingredient.amount))
             
             row = [
-                amount_unit,
-                ingredient.ingredient
+                amount_str,           # Amount
+                unit,                 # Unit (abbreviated)
+                f"{ingredient.weight_grams}g" if ingredient.weight_grams else "",  # Grams
+                ingredient.ingredient  # Ingredient name
             ]
-            
-            if show_weights and ingredient.weight_grams:
-                row.append(f"({ingredient.weight_grams}g)")
-            elif show_weights:
-                row.append("")
             
             if show_purpose and ingredient.purpose:
                 row.append(ingredient.purpose)
@@ -730,27 +889,79 @@ class PDFCardGenerator:
                 
             ingredients_data.append(row)
         
-        # STEP_28: Create ingredients table
+        # STEP_28: Create ingredients table with adaptive font sizing and right alignment
         if ingredients_data:
+            # Calculate available height for ingredients on front page
+            available_height = self._calculate_available_height(has_banner=True, page_num=1)
+            
+            # Reserve space for description if it exists
+            description_height = 0
+            if recipe.description:
+                description_height = self._measure_paragraph_height(
+                    recipe.description, 'Normal', self.content_width
+                ) + self.spacing/2
+                available_height -= description_height
+            
+            # Try adaptive font sizing starting from default
+            font_size = self.default_table_font
+            table_fits = False
+            
+            while font_size >= self.min_font_size and not table_fits:
+                # Estimate table height with current font size
+                estimated_height = self._measure_table_height(ingredients_data, col_widths, font_size)
+                
+                if estimated_height <= available_height:
+                    table_fits = True
+                    self.logger.debug("Ingredients table fits with font size %d (height: %.1f/%.1f)", 
+                                    font_size, estimated_height, available_height)
+                else:
+                    self.logger.debug("Font size %d too large (height: %.1f/%.1f), trying smaller", 
+                                    font_size, estimated_height, available_height)
+                    font_size -= 1
+            
+            # Use the font size that fits (or minimum if nothing fits)
+            final_font_size = max(font_size, self.min_font_size)
+            
+            # Create table with adaptive font size
             ingredients_table = Table(ingredients_data, colWidths=col_widths)
             
             table_style = [
                 ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 0), (-1, -1), 9),
-                ('ALIGN', (0, 0), (0, -1), 'LEFT'),    # Amount+unit left-aligned (close to quantity)
-                ('ALIGN', (1, 0), (-1, -1), 'LEFT'),   # Rest left-aligned
+                ('FONTSIZE', (0, 0), (-1, -1), final_font_size),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),   # All columns left-aligned
                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                # Minimal padding for compact display
-                ('LEFTPADDING', (0, 0), (-1, -1), 1),
-                ('RIGHTPADDING', (0, 0), (-1, -1), 1),
-                ('TOPPADDING', (0, 0), (-1, -1), 1),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                # Zero padding for maximum compactness
+                ('LEFTPADDING', (0, 0), (-1, -1), 0),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
                 # Remove alternating row colors for cleaner compact look
                 ('ROWBACKGROUNDS', (0, 0), (-1, -1), [white])
             ]
             
             ingredients_table.setStyle(TableStyle(table_style))
-            story.append(ingredients_table)
+            
+            # Log font adjustment if changed
+            if final_font_size != self.default_table_font:
+                self.logger.info("Ingredients table font adjusted from %d to %d to fit page", 
+                               self.default_table_font, final_font_size)
+            
+            # Right-justify the table by wrapping it in a container
+            from reportlab.platypus import KeepTogether
+            from reportlab.lib.enums import TA_RIGHT
+            
+            # Create a table that's only as wide as needed, then right-align it
+            table_container = Table([[ingredients_table]], colWidths=[actual_table_width])
+            table_container.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (0, 0), 'RIGHT'),
+                ('VALIGN', (0, 0), (0, 0), 'TOP'),
+                ('LEFTPADDING', (0, 0), (0, 0), 0),
+                ('RIGHTPADDING', (0, 0), (0, 0), 0),
+                ('TOPPADDING', (0, 0), (0, 0), 0),
+                ('BOTTOMPADDING', (0, 0), (0, 0), 0),
+            ]))
+            
+            story.append(table_container)
         
         return story
     
@@ -768,17 +979,96 @@ class PDFCardGenerator:
         
         # STEP_29: No section header for compact format
         
-        # STEP_30: Add numbered instructions with compact formatting
+        # STEP_30: Add numbered instructions with adaptive font sizing
+        # Calculate available height for instructions on back page
+        available_height = self._calculate_available_height(has_banner=True, page_num=2)
+        self.logger.info("📏 Back page available height: %.1fpt (content=%.1fpt, banner=%.1fpt, margins=%.1fpt)", 
+                        available_height, self.content_height, self.banner_height, 
+                        (self.card_height - self.content_height))
+        
+        # Build all instruction text to measure total height needed
+        all_instructions_text = []
         for i, instruction in enumerate(recipe.instructions, 1):
             instruction_text = f"{i}. {instruction}"
-            story.append(Paragraph(instruction_text, self.styles['Instruction']))
+            all_instructions_text.append(instruction_text)
+        
+        # Add notes text if present
+        notes_text = []
+        if recipe.notes:
+            for note in recipe.notes:
+                notes_text.append(f"• {note}")
+        
+        # Try adaptive font sizing for instructions
+        font_size = self.default_instruction_font
+        content_fits = False
+        
+        while font_size >= self.min_font_size and not content_fits:
+            # Estimate total height needed for all instructions + notes
+            instruction_height = 0
+            notes_height = 0
+            spacer_height = 0
+            
+            # Estimate instruction height with current font size
+            for instruction_text in all_instructions_text:
+                height = self._measure_paragraph_height(instruction_text, 'Instruction', self.content_width, font_size)
+                instruction_height += height
+            
+            # Add notes height with current font size (notes are 1pt smaller)
+            if notes_text:
+                spacer_height = self.spacing/2  # Spacer before notes
+                notes_font_size = max(font_size - 1, self.min_font_size)
+                for note_text in notes_text:
+                    height = self._measure_paragraph_height(note_text, 'Notes', self.content_width, notes_font_size)
+                    notes_height += height
+            
+            total_height = instruction_height + spacer_height + notes_height
+            
+            if total_height <= available_height:
+                content_fits = True
+                self.logger.info("✅ Back page fits with font %dpt: available=%.1fpt, instructions=%.1fpt, spacer=%.1fpt, notes=%.1fpt, total=%.1fpt", 
+                               font_size, available_height, instruction_height, spacer_height, notes_height, total_height)
+            else:
+                self.logger.info("❌ Font %dpt too large: available=%.1fpt, instructions=%.1fpt, spacer=%.1fpt, notes=%.1fpt, total=%.1fpt (over by %.1fpt)", 
+                               font_size, available_height, instruction_height, spacer_height, notes_height, total_height, total_height - available_height)
+                font_size -= 1
+        
+        # Use the font size that fits (or minimum if nothing fits)
+        final_font_size = max(font_size, self.min_font_size)
+        
+        # Create instruction style with adaptive font size
+        adaptive_instruction_style = ParagraphStyle(
+            'AdaptiveInstruction',
+            parent=self.styles['Instruction'],
+            fontSize=final_font_size
+        )
+        
+        notes_font_size = max(final_font_size - 1, self.min_font_size)
+        adaptive_notes_style = ParagraphStyle(
+            'AdaptiveNotes', 
+            parent=self.styles['Notes'],
+            fontSize=notes_font_size
+        )
+        
+        # Debug: Log the actual font sizes being applied
+        self.logger.info("🔧 Creating adaptive styles: instruction=%dpt, notes=%dpt", 
+                        final_font_size, notes_font_size)
+        self.logger.info("🔧 Instruction style fontSize: %s", getattr(adaptive_instruction_style, 'fontSize', 'MISSING'))
+        self.logger.info("🔧 Notes style fontSize: %s", getattr(adaptive_notes_style, 'fontSize', 'MISSING'))
+        
+        # Add instructions with adaptive font
+        for instruction_text in all_instructions_text:
+            story.append(Paragraph(instruction_text, adaptive_instruction_style))
         
         # STEP_31: Add notes as italic text at end of instructions (if room)
         if recipe.notes:
             story.append(Spacer(1, self.spacing/2))  # Small spacer
-            for note in recipe.notes:
-                # Use italic font (Notes style) without heading
-                story.append(Paragraph(f"• {note}", self.styles['Notes']))
+            for note_text in notes_text:
+                story.append(Paragraph(note_text, adaptive_notes_style))
+        
+        # Log font adjustment if changed
+        if final_font_size != self.default_instruction_font:
+            self.logger.info("Instructions font adjusted from %d to %d to fit page", 
+                           self.default_instruction_font, final_font_size)
         
         return story
     

@@ -54,17 +54,17 @@ class RecipePipeline:
             "yaml_subdir": "yaml",
             "pdf_subdir": "pdf", 
             "templates_subdir": "templates",
-            "config_subdir": "config",
             "force_rebuild": False,
             "verbose_logging": self.config.debug
         }
     
-    def run(self, force_rebuild: bool = False, demo_mode: bool = False) -> dict:
+    def run(self, force_rebuild: bool = False, demo_mode: bool = False, specific_files: list = None) -> dict:
         """Run the complete recipe processing pipeline.
         
         Args:
             force_rebuild: If True, rebuild all files regardless of staleness
             demo_mode: If True, run with demo recipes and settings
+            specific_files: If provided, only process these YAML files
             
         Returns:
             Dictionary with processing results and statistics
@@ -109,7 +109,15 @@ class RecipePipeline:
                 return self._run_demo_mode()
             
             # STEP_6: Get files that need processing
-            stale_files = self.file_manager.get_stale_pipeline_files()
+            if specific_files:
+                # Process only specified YAML files (convert paths to Path objects)
+                from pathlib import Path
+                yaml_files = [Path(f) for f in specific_files if f.endswith('.yaml')]
+                stale_files = {"markdown_to_yaml": [], "yaml_to_pdf": yaml_files}
+                self.logger.info("Processing %d specific YAML files", len(yaml_files))
+            else:
+                # Process all stale files
+                stale_files = self.file_manager.get_stale_pipeline_files()
             
             if not stale_files["markdown_to_yaml"] and not stale_files["yaml_to_pdf"]:
                 self.logger.info("No files need processing - all up to date")
@@ -429,6 +437,12 @@ def main() -> int:
     )
     
     parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Enable verbose output (equivalent to --log-level INFO)"
+    )
+    
+    parser.add_argument(
         "--log-level", "-l",
         default="WARNING",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
@@ -438,10 +452,14 @@ def main() -> int:
     parser.add_argument(
         "files",
         nargs="*",
-        help="Specific recipe files to process (not yet implemented)"
+        help="Specific recipe files to process (YAML files)"
     )
     
     args = parser.parse_args()
+    
+    # Handle verbose flag
+    if args.verbose:
+        args.log_level = "INFO"
     
     # Setup logging
     setup_logging(args.log_level)
@@ -468,7 +486,8 @@ def main() -> int:
         # Run pipeline
         results = pipeline.run(
             force_rebuild=args.force,
-            demo_mode=args.demo
+            demo_mode=args.demo,
+            specific_files=args.files if args.files else None
         )
         
         # Report results
