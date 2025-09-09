@@ -414,11 +414,17 @@ Extract from "Notes", "Tips", "Variations" sections or recipe comments:
 - Make-ahead instructions
 
 ## DATA TYPE REQUIREMENTS
-- amounts: MUST be numbers (float/int), never strings
+- amounts: MUST be numbers (float/int), never strings or null
 - servings: MUST be integer
 - weight_grams: MUST be integer (whole grams)
 - Convert fractions to decimals (1/2 → 0.5, 1/4 → 0.25, 3/4 → 0.75)
 - Handle mixed numbers (2 1/2 → 2.5)
+- For garnish/optional ingredients without amounts: estimate reasonable serving portions (0.25 for garnishes)
+
+## SPECIAL HANDLING
+- Garnish ingredients: Use amount 0.25 and unit "portion" for items like "fresh berries for garnish"
+- Optional ingredients: Always provide numeric amounts, never null or empty
+- Instructions: MUST be an array of strings, never objects or nested structures
 
 ## QUALITY STANDARDS
 - Clean ingredient names (remove extra words like "fresh", "large" unless essential)

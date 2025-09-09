@@ -225,6 +225,76 @@ class MarkdownParser:
             self.logger.exception(error_msg)
             return ParseResult(success=False, error=error_msg)
     
+    def _clean_openai_response(self, yaml_data: dict, recipe_name: str) -> dict:
+        """Clean and fix common OpenAI response issues.
+        
+        Args:
+            yaml_data: Raw YAML data from OpenAI
+            recipe_name: Recipe name for logging
+            
+        Returns:
+            Cleaned YAML data
+        """
+        try:
+            # Fix ingredients with null/missing amounts
+            if 'ingredients' in yaml_data and isinstance(yaml_data['ingredients'], list):
+                for i, ingredient in enumerate(yaml_data['ingredients']):
+                    if isinstance(ingredient, dict):
+                        # Fix null amounts for garnish ingredients
+                        if ingredient.get('amount') is None:
+                            ingredient_name = ingredient.get('ingredient', '').lower()
+                            if any(word in ingredient_name for word in ['garnish', 'for serving', 'optional', 'to taste']):
+                                ingredient['amount'] = 0.25
+                                ingredient['unit'] = 'portion'
+                                self.logger.debug("Fixed null amount for garnish ingredient in %s: %s", 
+                                               recipe_name, ingredient.get('ingredient'))
+                            else:
+                                ingredient['amount'] = 1.0
+                                ingredient['unit'] = 'count'
+                                self.logger.warning("Fixed null amount for ingredient in %s: %s", 
+                                                  recipe_name, ingredient.get('ingredient'))
+                        
+                        # Ensure weight_grams is integer
+                        if 'weight_grams' in ingredient and ingredient['weight_grams'] is not None:
+                            try:
+                                ingredient['weight_grams'] = int(float(ingredient['weight_grams']))
+                            except (ValueError, TypeError):
+                                ingredient['weight_grams'] = 10  # Default small weight
+            
+            # Fix instructions if they're returned as dict instead of list
+            if 'instructions' in yaml_data:
+                instructions = yaml_data['instructions']
+                if isinstance(instructions, dict):
+                    # Convert dict to list of strings
+                    instruction_list = []
+                    for key, value in instructions.items():
+                        if isinstance(value, str):
+                            instruction_list.append(f"{key}: {value}")
+                        else:
+                            instruction_list.append(str(key))
+                    yaml_data['instructions'] = instruction_list
+                    self.logger.warning("Fixed dict instructions for %s, converted to list", recipe_name)
+                elif isinstance(instructions, list):
+                    # Ensure all instructions are strings
+                    fixed_instructions = []
+                    for instr in instructions:
+                        if isinstance(instr, dict):
+                            # Convert dict instruction to string
+                            if len(instr) == 1:
+                                key, value = next(iter(instr.items()))
+                                fixed_instructions.append(f"{key}: {value}" if isinstance(value, str) else str(key))
+                            else:
+                                fixed_instructions.append(str(instr))
+                        else:
+                            fixed_instructions.append(str(instr))
+                    yaml_data['instructions'] = fixed_instructions
+                    
+            return yaml_data
+            
+        except Exception as e:
+            self.logger.warning("Error cleaning OpenAI response for %s: %s", recipe_name, e)
+            return yaml_data
+    
     def _validate_and_parse_yaml(
         self, 
         yaml_content: str, 
@@ -275,7 +345,10 @@ class MarkdownParser:
                     cached=cached
                 )
             
-            # STEP_11: Validate with Pydantic model
+            # STEP_11: Clean and validate YAML data
+            yaml_data = self._clean_openai_response(yaml_data, recipe_name)
+            
+            # STEP_12: Validate with Pydantic model
             try:
                 recipe = Recipe(**yaml_data)
                 
