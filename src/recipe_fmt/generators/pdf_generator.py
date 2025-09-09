@@ -211,6 +211,26 @@ class PDFCardGenerator:
             spaceAfter=0
         ))
         
+        # Compact banner left style (for title)
+        self.styles.add(ParagraphStyle(
+            name='CompactBannerLeft',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            alignment=TA_LEFT,
+            textColor=white,
+            spaceAfter=0
+        ))
+        
+        # Compact banner right style (for category)
+        self.styles.add(ParagraphStyle(
+            name='CompactBannerRight',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            alignment=TA_RIGHT,
+            textColor=white,
+            spaceAfter=0
+        ))
+        
         # Section header style
         self.styles.add(ParagraphStyle(
             name='SectionHeader',
@@ -414,7 +434,7 @@ class PDFCardGenerator:
         return story
     
     def _build_front_side(self, recipe: Recipe) -> list:
-        """Build front side content (title + ingredients).
+        """Build front side content (compact title + ingredients + description).
         
         Args:
             recipe: Recipe to generate content for
@@ -424,16 +444,28 @@ class PDFCardGenerator:
         """
         story = []
         
-        # STEP_16: Header section
-        story.extend(self._build_header_section(recipe))
+        # STEP_16: Compact banner with title + category
+        story.extend(self._build_compact_banner(recipe))
         
-        # STEP_17: Ingredients section
+        # STEP_17: Compact ingredients section (no heading)
         story.extend(self._build_ingredients_section(recipe))
+        
+        # STEP_18: Add description if there's room and it exists
+        if recipe.description:
+            story.append(Spacer(1, self.spacing/2))
+            desc_style = ParagraphStyle(
+                'CompactDescription',
+                parent=self.styles['Normal'],
+                fontSize=8,
+                spaceAfter=2,
+                fontName='Helvetica-Oblique'
+            )
+            story.append(Paragraph(recipe.description, desc_style))
         
         return story
     
     def _build_back_side(self, recipe: Recipe) -> list:
-        """Build back side content (instructions + notes).
+        """Build back side content (compact serves/time + instructions + notes).
         
         Args:
             recipe: Recipe to generate content for
@@ -443,18 +475,36 @@ class PDFCardGenerator:
         """
         story = []
         
-        # STEP_18: Category banner (smaller on back)
-        if self.cfg_dict.get("show_category_banner", True):
-            story.extend(self._build_category_banner(recipe, height=0.2*inch))
+        # STEP_18: Compact banner with serves/time + category
+        serves_time_text = self._build_serves_time_text(recipe)
+        story.extend(self._build_compact_banner(recipe, left_content=serves_time_text))
         
-        # STEP_19: Instructions section
+        # STEP_19: Compact instructions section (no heading, includes notes)
         story.extend(self._build_instructions_section(recipe))
         
-        # STEP_20: Notes section
-        if recipe.notes:
-            story.extend(self._build_notes_section(recipe))
-        
         return story
+    
+    def _build_serves_time_text(self, recipe: Recipe) -> str:
+        """Build serves and time text for compact banner.
+        
+        Args:
+            recipe: Recipe to get metadata from
+            
+        Returns:
+            Formatted serves/time string
+        """
+        parts = []
+        
+        if recipe.servings:
+            parts.append(f"Serves {recipe.servings}")
+        
+        if recipe.prep_time:
+            parts.append(f"Prep: {recipe.prep_time}")
+        
+        if recipe.cook_time:
+            parts.append(f"Cook: {recipe.cook_time}")
+        
+        return " • ".join(parts) if parts else ""
     
     def _build_header_section(self, recipe: Recipe) -> list:
         """Build header section with title and category banner.
@@ -510,6 +560,58 @@ class PDFCardGenerator:
         banner_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, -1), category_color),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ]))
+        
+        story.append(banner_table)
+        story.append(Spacer(1, self.spacing/2))
+        
+        return story
+    
+    def _build_compact_banner(self, recipe: Recipe, left_content: str = "", height: Optional[float] = None) -> list:
+        """Build compact banner with content on left and category on right.
+        
+        Args:
+            recipe: Recipe to generate banner for
+            left_content: Content for left side (e.g., title, serves/time)
+            height: Optional custom height
+            
+        Returns:
+            List of ReportLab flowables
+        """
+        story = []
+        
+        banner_height = height or self.banner_height
+        category_color = CategoryColors.get_color(recipe.category)
+        
+        # Convert title to Snake_Case format
+        title_snake_case = recipe.title.replace(' ', '_').replace('-', '_')
+        display_title = left_content or title_snake_case
+        
+        # STEP_24a: Create two-column banner: Title (left) + Category (right)
+        banner_data = [[
+            Paragraph(display_title, self.styles['CompactBannerLeft']),
+            Paragraph(recipe.category.upper(), self.styles['CompactBannerRight'])
+        ]]
+        
+        # Split banner width: more space for title, fixed space for category
+        title_width = self.content_width * 0.7
+        category_width = self.content_width * 0.3
+        
+        banner_table = Table(
+            banner_data,
+            colWidths=[title_width, category_width],
+            rowHeights=[banner_height]
+        )
+        
+        banner_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), category_color),
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),     # Title left-aligned
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),    # Category right-aligned
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('LEFTPADDING', (0, 0), (-1, -1), 6),
             ('RIGHTPADDING', (0, 0), (-1, -1), 6),
@@ -582,35 +684,37 @@ class PDFCardGenerator:
         """
         story = []
         
-        # STEP_25: Section header
-        story.append(Paragraph("INGREDIENTS", self.styles['SectionHeader']))
+        # STEP_25: No section header for compact format
         
-        # STEP_26: Build ingredients table
+        # STEP_26: Build compact ingredients table
         table_width = max_width or self.content_width
         ingredients_data = []
         
         show_weights = self.config.show_weights
         show_purpose = any(ing.purpose for ing in recipe.ingredients)
         
-        # Determine column structure
+        # Determine column structure - make units closer to amounts
         if show_weights and show_purpose:
-            # Amount | Unit | Ingredient | Weight | Purpose
-            col_widths = [0.8*inch, 0.8*inch, table_width-3.2*inch, 0.8*inch, 0.8*inch]
+            # Amount+Unit | Ingredient | Weight | Purpose
+            col_widths = [1.2*inch, table_width-2.8*inch, 0.8*inch, 0.8*inch]
         elif show_weights:
-            # Amount | Unit | Ingredient | Weight
-            col_widths = [0.8*inch, 0.8*inch, table_width-2.4*inch, 0.8*inch]
+            # Amount+Unit | Ingredient | Weight
+            col_widths = [1.2*inch, table_width-2.0*inch, 0.8*inch]
         elif show_purpose:
-            # Amount | Unit | Ingredient | Purpose
-            col_widths = [0.8*inch, 0.8*inch, table_width-2.4*inch, 0.8*inch]
+            # Amount+Unit | Ingredient | Purpose
+            col_widths = [1.2*inch, table_width-2.0*inch, 0.8*inch]
         else:
-            # Amount | Unit | Ingredient
-            col_widths = [0.8*inch, 0.8*inch, table_width-1.6*inch]
+            # Amount+Unit | Ingredient
+            col_widths = [1.2*inch, table_width-1.2*inch]
         
-        # STEP_27: Add ingredient rows
+        # STEP_27: Add ingredient rows with compact formatting
         for ingredient in recipe.ingredients:
+            # Combine amount and unit for more compact display
+            amount_str = str(ingredient.amount) if ingredient.amount != int(ingredient.amount) else str(int(ingredient.amount))
+            amount_unit = f"{amount_str} {ingredient.unit}"
+            
             row = [
-                str(ingredient.amount) if ingredient.amount != int(ingredient.amount) else str(int(ingredient.amount)),
-                ingredient.unit,
+                amount_unit,
                 ingredient.ingredient
             ]
             
@@ -633,14 +737,16 @@ class PDFCardGenerator:
             table_style = [
                 ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                 ('FONTSIZE', (0, 0), (-1, -1), 9),
-                ('ALIGN', (0, 0), (1, -1), 'RIGHT'),  # Amount and unit right-aligned
-                ('ALIGN', (2, 0), (-1, -1), 'LEFT'),   # Rest left-aligned
+                ('ALIGN', (0, 0), (0, -1), 'LEFT'),    # Amount+unit left-aligned (close to quantity)
+                ('ALIGN', (1, 0), (-1, -1), 'LEFT'),   # Rest left-aligned
                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                ('LEFTPADDING', (0, 0), (-1, -1), 3),
-                ('RIGHTPADDING', (0, 0), (-1, -1), 3),
-                ('TOPPADDING', (0, 0), (-1, -1), 2),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
-                ('ROWBACKGROUNDS', (0, 0), (-1, -1), [white, Color(0.95, 0.95, 0.95)])
+                # Minimal padding for compact display
+                ('LEFTPADDING', (0, 0), (-1, -1), 1),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 1),
+                ('TOPPADDING', (0, 0), (-1, -1), 1),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                # Remove alternating row colors for cleaner compact look
+                ('ROWBACKGROUNDS', (0, 0), (-1, -1), [white])
             ]
             
             ingredients_table.setStyle(TableStyle(table_style))
@@ -649,7 +755,7 @@ class PDFCardGenerator:
         return story
     
     def _build_instructions_section(self, recipe: Recipe, max_width: Optional[float] = None) -> list:
-        """Build instructions section.
+        """Build compact instructions section without heading, with integrated notes.
         
         Args:
             recipe: Recipe to generate instructions for
@@ -660,13 +766,19 @@ class PDFCardGenerator:
         """
         story = []
         
-        # STEP_29: Section header
-        story.append(Paragraph("INSTRUCTIONS", self.styles['SectionHeader']))
+        # STEP_29: No section header for compact format
         
-        # STEP_30: Add numbered instructions
+        # STEP_30: Add numbered instructions with compact formatting
         for i, instruction in enumerate(recipe.instructions, 1):
             instruction_text = f"{i}. {instruction}"
             story.append(Paragraph(instruction_text, self.styles['Instruction']))
+        
+        # STEP_31: Add notes as italic text at end of instructions (if room)
+        if recipe.notes:
+            story.append(Spacer(1, self.spacing/2))  # Small spacer
+            for note in recipe.notes:
+                # Use italic font (Notes style) without heading
+                story.append(Paragraph(f"• {note}", self.styles['Notes']))
         
         return story
     
