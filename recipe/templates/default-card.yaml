@@ -13,13 +13,13 @@ card:
     width: 8.5  # inches
     height: 4.0  # inches
     orientation: "landscape"
-  
+
   margins:
-    top: 0.25     # inches
-    bottom: 0.25  # inches
+    top: 0.15     # inches (3.5mm - minimum printer margin)
+    bottom: 0.15  # inches (3.5mm - minimum printer margin)
     left: 0.25    # inches
     right: 0.25   # inches
-  
+
   layout: "two_sided"  # two_sided, single_sided, ingredients_only, instructions_only
 
 # Typography settings
@@ -30,7 +30,7 @@ typography:
     alignment: "center"
     color: "black"
     space_after: 6
-  
+
   category_banner:
     font_name: "Helvetica-Bold"
     font_size: 12
@@ -38,7 +38,7 @@ typography:
     color: "white"
     background: "category_color"  # Uses category-specific color
     height: 0.3  # inches
-  
+
   section_header:
     font_name: "Helvetica-Bold"
     font_size: 14
@@ -46,35 +46,35 @@ typography:
     color: "black"
     space_before: 8
     space_after: 4
-  
+
   metadata:
     font_name: "Helvetica"
     font_size: 9
     alignment: "center"
     color: "#666666"
     space_after: 4
-  
+
   description:
     font_name: "Helvetica-Oblique"
     font_size: 10
     alignment: "center"
     color: "black"
     space_after: 6
-  
+
   ingredient:
     font_name: "Helvetica"
     font_size: 9
     alignment: "left"
     color: "black"
     space_after: 2
-  
+
   instruction:
     font_name: "Helvetica"
     font_size: 10
     alignment: "justify"
     color: "black"
     space_after: 3
-  
+
   notes:
     font_name: "Helvetica-Oblique"
     font_size: 9
@@ -90,7 +90,7 @@ display:
   show_metadata: true
   show_description: true
   show_notes: true
-  
+
   # Ingredient table configuration
   ingredients:
     columns:
@@ -117,7 +117,7 @@ display:
         alignment: "left"
         label: "Purpose"
         show_when: "show_purpose"
-    
+
     styling:
       alternating_rows: true
       row_colors: ["#FFFFFF", "#F5F5F5"]
@@ -137,13 +137,13 @@ colors:
     Baking: "#CC9966"      # Warm Brown
     Dessert: "#CC6699"     # Pink
     Other: "#999999"       # Gray
-  
+
   # Additional color definitions
   text:
     primary: "#000000"
     secondary: "#666666"
     light: "#999999"
-  
+
   background:
     primary: "#FFFFFF"
     alternate: "#F5F5F5"
@@ -167,7 +167,7 @@ layout_sections:
         height: 0.1  # inches
       - type: "ingredients"
         height: "remaining"
-  
+
   back_side:
     sections:
       - type: "category_banner"
@@ -187,11 +187,11 @@ layout_sections:
 single_sided_layout:
   columns: 2
   column_split: 0.5  # 50/50 split
-  
+
   left_column:
     - type: "ingredients"
       height: "remaining"
-  
+
   right_column:
     - type: "instructions"
       height: "auto"
@@ -201,7 +201,7 @@ single_sided_layout:
     - type: "notes"
       height: "auto"
       show_when: "show_notes"
-  
+
   header:
     - type: "category_banner"
       height: 0.3  # inches
@@ -222,16 +222,21 @@ advanced:
   watermark: false
   crop_marks: false
   bleed: 0  # inches
-  
+
   # Quality settings
   image_dpi: 300
   text_rendering: "high_quality"
   compression: true
-  
+
   # Accessibility
   pdf_version: "1.4"
   tagged_pdf: false
-  
+
   # Print settings
   print_scaling: "none"
   duplex: "short_edge"  # For two-sided printing
+
+  # Height estimation buffers for adaptive font sizing
+  height_estimation:
+    table_safety_buffer: 1.3    # 30% buffer for table height estimation
+    paragraph_safety_buffer: 1.8 # 30% buffer for paragraph height estimation

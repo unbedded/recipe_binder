@@ -54,7 +54,6 @@ class FileManager:
             "yaml_subdir": "yaml", 
             "pdf_subdir": "pdf",
             "templates_subdir": "templates",
-            "config_subdir": "config",
             "force_rebuild": False,
             "verbose_logging": False
         }
@@ -247,8 +246,7 @@ class FileManager:
                 recipe_dir / self.cfg_dict["markdown_subdir"],
                 recipe_dir / self.cfg_dict["yaml_subdir"], 
                 recipe_dir / self.cfg_dict["pdf_subdir"],
-                recipe_dir / self.cfg_dict["templates_subdir"],
-                recipe_dir / self.cfg_dict["config_subdir"]
+                recipe_dir / self.cfg_dict["templates_subdir"]
             ]
             
             for directory in directories:

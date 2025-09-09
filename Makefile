@@ -17,21 +17,29 @@ install: ## Install dependencies and setup development environment
 
 clean: ## Remove all generated PDF files and cache
 	@echo "🧹 Cleaning generated files..."
-	rm -rf recipe/pdf/*.pdf
+	rm -rf recipe/pdf/*.pdf recipe/pdf/.timestamp
 	rm -rf .pytest_cache/
 	rm -rf .mypy_cache/
 	rm -rf .ruff_cache/
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	@echo "✅ Clean complete!"
 
-build: ## Process all recipes through the pipeline
-	@echo "🚀 Building recipe cards..."
-	python -m recipe_fmt.pipeline
+build: recipe/pdf/.timestamp ## Process all recipes through the pipeline (with dependency tracking)
 	@echo "✅ Build complete! Check recipe/pdf/ for generated cards."
+
+# Timestamp-based dependency tracking - only rebuilds when YAML or template files change
+recipe/pdf/.timestamp: $(wildcard recipe/yaml/*.yaml) recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building recipe cards..."
+	python -m recipe_fmt.pipeline --log-level INFO
+	@touch $@
+
+# Ensure PDF directory exists
+recipe/pdf:
+	@mkdir -p recipe/pdf
 
 demo: ## Generate demo recipe cards
 	@echo "🍳 Creating demo recipes..."
-	python -m recipe_fmt.pipeline --demo
+	python -m recipe_fmt.pipeline --demo --log-level INFO
 	@echo "✅ Demo complete! Open recipe/pdf/ to view sample cards."
 
 lint: ## Run code formatting and linting
