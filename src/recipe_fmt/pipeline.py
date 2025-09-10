@@ -251,8 +251,11 @@ class RecipePipeline:
                         warning.message,
                     )
 
-            # STEP_15: Write validated YAML file
-            yaml_file.write_text(parse_result.yaml_content)
+            # STEP_15: Enhance with nutrition data (if USDA_API_KEY available)
+            enhanced_yaml_content = self._enhance_with_nutrition(parse_result.yaml_content, yaml_file)
+
+            # STEP_16: Write enhanced YAML file
+            yaml_file.write_text(enhanced_yaml_content)
 
             # STEP_16: Log success with metrics
             self.logger.info("Successfully processed %s → %s", md_file.name, yaml_file.name)
@@ -274,6 +277,50 @@ class RecipePipeline:
             result["errors"].append(error_msg)
 
         return result
+
+    def _enhance_with_nutrition(self, yaml_content: str, yaml_file: Path) -> str:
+        """Enhance YAML content with nutrition data if USDA API key is available.
+
+        Args:
+            yaml_content: Original YAML content string
+            yaml_file: Path to YAML file (for logging)
+
+        Returns:
+            Enhanced YAML content string (with or without nutrition)
+        """
+        import os
+
+        # Only try to enhance if USDA_API_KEY is available
+        usda_api_key = os.getenv("USDA_API_KEY")
+        if not usda_api_key or usda_api_key == "DEMO_KEY":
+            self.logger.info("No USDA API key found - skipping nutrition enhancement for %s", yaml_file)
+            return yaml_content
+
+        try:
+            # Import nutrition calculator
+            import yaml
+
+            from .nutrition.calculator import NutritionCalculator
+
+            # Parse YAML content to dict
+            recipe_data = yaml.safe_load(yaml_content)
+
+            # Initialize nutrition calculator
+            calculator = NutritionCalculator(api_key=usda_api_key, cfg_dict={"log_level": "WARNING"})
+
+            # Enhance with nutrition
+            enhanced_data = calculator.enhance_recipe(recipe_data)
+
+            # Convert back to YAML string
+            enhanced_yaml = yaml.dump(enhanced_data, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+            self.logger.info("Enhanced %s with nutrition data", yaml_file)
+            return enhanced_yaml
+
+        except Exception as e:
+            # If nutrition enhancement fails, continue with original content
+            self.logger.warning("Failed to enhance %s with nutrition data: %s", yaml_file, e)
+            return yaml_content
 
     def _process_yaml_to_pdf(self, yaml_file: Path) -> dict:
         """Process a single YAML file to PDF using the template system.
@@ -402,11 +449,9 @@ def setup_logging(log_level: str = "WARNING") -> None:
     Args:
         log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     """
-    logging.basicConfig(
-        level=getattr(logging, log_level.upper()),
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[logging.StreamHandler(), logging.FileHandler("recipe_pipeline.log", mode="a")],
-    )
+    from .utils.logging_setup import setup_logging as centralized_setup_logging
+
+    centralized_setup_logging(log_level=log_level, console_output=True)
 
 
 def main() -> int:

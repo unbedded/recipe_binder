@@ -70,17 +70,17 @@ class TestOpenAIClientInitialization:
         assert client.cfg_dict["cost_tracking"] is True
 
     @patch("openai.OpenAI")
-    def test_openai_library_import_success(self, mock_openai):
+    def test_openai_library_import_success(self, mock_openai_class):
         """Test successful OpenAI library import and client creation."""
         config = OpenAIConfig(api_key="sk-test-key")
-        mock_openai.OpenAI.return_value = Mock()
+        mock_openai_class.return_value = Mock()
 
         client = OpenAIClient(config)
 
-        mock_openai.OpenAI.assert_called_once_with(api_key="sk-test-key")
+        mock_openai_class.assert_called_once_with(api_key="sk-test-key")
         assert client.cfg_dict["mock_mode"] is False
 
-    @patch("recipe_fmt.parsers.openai_client.openai", side_effect=ImportError())
+    @patch("openai.OpenAI", side_effect=ImportError("No module named 'openai'"))
     def test_openai_library_import_failure(self, mock_openai):
         """Test graceful handling of missing OpenAI library."""
         config = OpenAIConfig(api_key="sk-test-key")

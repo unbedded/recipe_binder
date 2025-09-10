@@ -21,7 +21,7 @@ Example usage:
     )
 """
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class Ingredient(BaseModel):
@@ -43,6 +43,11 @@ class Ingredient(BaseModel):
             "teaspoon": "tsp",
             "teaspoons": "tsp",
             "t": "tsp",
+            "count": "cnt",
+            "counts": "cnt",
+            "each": "cnt",
+            "piece": "cnt",
+            "pieces": "cnt",
         }
         return unit_map.get(v.lower(), v)
 
@@ -51,10 +56,10 @@ class Nutrition(BaseModel):
     """Nutritional information per serving."""
 
     calories: int | None = Field(None, ge=0, description="Calories per serving")
-    protein_g: float | None = Field(None, ge=0, description="Protein in grams")
-    carbs_g: float | None = Field(None, ge=0, description="Carbohydrates in grams")
-    fat_g: float | None = Field(None, ge=0, description="Fat in grams")
-    fiber_g: float | None = Field(None, ge=0, description="Fiber in grams")
+    protein_g: int | None = Field(None, ge=0, description="Protein in grams")
+    carbs_g: int | None = Field(None, ge=0, description="Carbohydrates in grams")
+    fat_g: int | None = Field(None, ge=0, description="Fat in grams")
+    fiber_g: int | None = Field(None, ge=0, description="Fiber in grams")
     sodium_mg: int | None = Field(None, ge=0, description="Sodium in milligrams")
 
 
@@ -81,6 +86,19 @@ class Recipe(BaseModel):
     cook_time_minutes: int | None = Field(None, ge=0, description="Cooking time in minutes")
     tags: list[str] | None = Field(None, description="Recipe tags for categorization")
     source: str | None = Field(None, description="Recipe source or attribution")
+
+    @model_validator(mode="before")
+    @classmethod
+    def handle_nested_nutrition(cls, data):
+        """Handle nested nutrition.per_serving structure from YAML."""
+        if isinstance(data, dict) and "nutrition" in data:
+            nutrition_data = data["nutrition"]
+
+            # If nutrition has a 'per_serving' key, flatten it
+            if isinstance(nutrition_data, dict) and "per_serving" in nutrition_data:
+                data["nutrition"] = nutrition_data["per_serving"]
+
+        return data
 
     @field_validator("category")
     def validate_category(cls, v: str) -> str:

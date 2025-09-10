@@ -57,10 +57,10 @@ class TestCategoryColors:
         """Test getting color for valid categories."""
         breakfast_color = CategoryColors.get_color("Breakfast")
         assert breakfast_color is not None
-        # Golden Yellow: (1.0, 0.8, 0.2)
-        assert breakfast_color.red == 1.0
-        assert breakfast_color.green == 0.8
-        assert breakfast_color.blue == 0.2
+        # Amber/Gold: (0.85, 0.55, 0.0)
+        assert breakfast_color.red == 0.85
+        assert breakfast_color.green == 0.55
+        assert breakfast_color.blue == 0.0
 
         meat_color = CategoryColors.get_color("Meat")
         assert meat_color is not None
@@ -223,8 +223,10 @@ class TestPDFCardGeneratorGeneration:
 
         generator = PDFCardGenerator(self.config)
 
-        # Mock file creation for size calculation
-        with patch.object(Path, "stat") as mock_stat:
+        # Mock filesystem operations for testing
+        with patch.object(Path, "mkdir"), \
+             patch.object(Path, "stat") as mock_stat, \
+             patch.object(Path, "is_dir", return_value=True):
             from types import SimpleNamespace
 
             mock_stat.return_value = SimpleNamespace(st_size=15000)  # 15KB file
@@ -275,7 +277,9 @@ class TestPDFCardGeneratorGeneration:
             cfg_dict = {"card_layout": layout}
             generator = PDFCardGenerator(self.config, cfg_dict)
 
-            with patch.object(Path, "stat") as mock_stat:
+            with patch.object(Path, "mkdir"), \
+                 patch.object(Path, "stat") as mock_stat, \
+                 patch.object(Path, "is_dir", return_value=True):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=10000)
@@ -469,7 +473,9 @@ class TestPDFCardGeneratorEdgeCases:
             generator = PDFCardGenerator(self.config)
             output_path = Path(self.temp_dir) / "empty.pdf"
 
-            with patch.object(Path, "stat") as mock_stat:
+            with patch.object(Path, "mkdir"), \
+                 patch.object(Path, "stat") as mock_stat, \
+                 patch.object(Path, "is_dir", return_value=True):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=1000)
@@ -496,7 +502,9 @@ class TestPDFCardGeneratorEdgeCases:
             generator = PDFCardGenerator(self.config)
             output_path = Path(self.temp_dir) / "long_title.pdf"
 
-            with patch.object(Path, "stat") as mock_stat:
+            with patch.object(Path, "mkdir"), \
+                 patch.object(Path, "stat") as mock_stat, \
+                 patch.object(Path, "is_dir", return_value=True):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=2000)
@@ -523,7 +531,9 @@ class TestPDFCardGeneratorEdgeCases:
             generator = PDFCardGenerator(self.config)
             output_path = Path(self.temp_dir) / "unicode.pdf"
 
-            with patch.object(Path, "stat") as mock_stat:
+            with patch.object(Path, "mkdir"), \
+                 patch.object(Path, "stat") as mock_stat, \
+                 patch.object(Path, "is_dir", return_value=True):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=3000)
@@ -560,7 +570,9 @@ class TestPDFCardGeneratorEdgeCases:
             generator = PDFCardGenerator(self.config)
             output_path = Path(self.temp_dir) / "many_ingredients.pdf"
 
-            with patch.object(Path, "stat") as mock_stat:
+            with patch.object(Path, "mkdir"), \
+                 patch.object(Path, "stat") as mock_stat, \
+                 patch.object(Path, "is_dir", return_value=True):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=20000)
@@ -650,7 +662,9 @@ class TestPDFCardGeneratorIntegration:
         generator = PDFCardGenerator(self.config)
         output_path = Path(self.temp_dir) / "comprehensive.pdf"
 
-        with patch.object(Path, "stat") as mock_stat:
+        with patch.object(Path, "mkdir"), \
+             patch.object(Path, "stat") as mock_stat, \
+             patch.object(Path, "is_dir", return_value=True):
             from types import SimpleNamespace
 
             mock_stat.return_value = SimpleNamespace(st_size=25000)
@@ -689,7 +703,9 @@ class TestPDFCardGeneratorIntegration:
                 generator = PDFCardGenerator(self.config, cfg_dict)
                 output_path = Path(self.temp_dir) / f"{layout.value}.pdf"
 
-                with patch.object(Path, "stat") as mock_stat:
+                with patch.object(Path, "mkdir"), \
+                     patch.object(Path, "stat") as mock_stat, \
+                     patch.object(Path, "is_dir", return_value=True):
                     from types import SimpleNamespace
 
                     mock_stat.return_value = SimpleNamespace(st_size=10000)

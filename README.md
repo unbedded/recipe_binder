@@ -8,13 +8,23 @@ Transform your markdown recipes into beautiful, print-ready cards using OpenAI a
 
 **The "WHY" hits you when you realize the power:**
 
-- 📝 **Write Once**: Simple markdown recipe → OpenAI creates structured data with weights & nutrition
+- 📝 **Write Once**: Simple markdown recipe → OpenAI creates structured data with weights & USDA nutrition
 - 🔄 **Endless Variations**: Ask any AI to "scale this to 12 servings" or "make it vegan" - instant YAML updates  
 - ⚖️ **Professional Precision**: Auto-converts volumes to weights (1 cup flour = 120g) for scale-based cooking
-- 🧮 **Smart Calculations**: OpenAI knows ingredient densities, nutritional values, and cooking adjustments
-- 🎨 **Perfect Cards**: Structured data → beautiful, consistent PDF cards every time
+- 🧮 **Smart Calculations**: OpenAI knows ingredient densities, USDA provides accurate nutritional data
+- 🎨 **Perfect Cards**: Structured data → beautiful, consistent PDF cards with nutrition facts every time
 
 **From "random recipe blog post" to "professional kitchen-ready card" in seconds, with infinite AI-powered customization.**
+
+### 📋 See the Results
+
+**Professional recipe cards with precise weights and nutrition facts:**
+
+| Front Side (Ingredients & Nutrition) | Back Side (Instructions) |
+|:---:|:---:|
+| ![Recipe Front](docs/recipe_front.png) | ![Recipe Back](docs/recipe_back.png) |
+
+*Example: Garlic Herb Bread with auto-calculated weights (grams) and USDA nutrition data*
 
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -28,6 +38,7 @@ Transform your markdown recipes into beautiful, print-ready cards using OpenAI a
 
 🤖 **AI-Powered Pipeline**: Automatically parse markdown recipes into structured YAML using OpenAI
 🎨 **Professional Card Design**: Generate 8.5"×4" landscape, two-sided recipe cards optimized for professional kitchens
+🥗 **Nutrition Facts**: Automatic nutrition calculation using USDA FoodData Central API with 350,000+ food items
 🔄 **Smart Build System**: Timestamp-based staleness detection - only rebuild what's changed
 📐 **Template-Driven Layout**: Fully customizable card designs via YAML configuration
 🎯 **Category Color Coding**: Visual organization with predefined color schemes for different recipe types
@@ -40,6 +51,10 @@ Transform your markdown recipes into beautiful, print-ready cards using OpenAI a
 git clone https://github.com/yourusername/recipe-binder.git
 cd recipe-binder
 make install
+
+# Set up API keys (required for AI parsing and nutrition)
+export OPENAI_API_KEY="your-openai-api-key"
+export USDA_API_KEY="your-usda-api-key"  # Get free key: https://fdc.nal.usda.gov/api-key-signup
 
 # Generate demo cards
 make demo
@@ -118,17 +133,68 @@ Each category uses a distinct background color with bold white text for the head
 
 | Category    | Icon | Color        | Hex Code  | Sample Header |
 |-------------|------|--------------|-----------|---------------|
-| Meat        | 🥩   | Dark Brown   | `#5D4037` | <div style="background-color: #5D4037; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🥩 MEAT - Perfect Grilled Steak</div> |
-| Side        | 🥗   | Forest Green | `#2E7D32` | <div style="background-color: #2E7D32; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🥗 SIDE - Roasted Vegetables</div> |
-| Main        | 🍽️   | Green        | `#388E3C` | <div style="background-color: #388E3C; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍽️ MAIN - Chicken Parmesan</div> |
-| Soup        | 🍲   | Teal         | `#00897B` | <div style="background-color: #00897B; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍲 SOUP - Tomato Basil Soup</div> |
-| Sauce       | 🍯   | Amber        | `#FF8F00` | <div style="background-color: #FF8F00; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍯 SAUCE - Hollandaise Sauce</div> |
-| Breakfast   | 🥞   | Deep Orange  | `#EF6C00` | <div style="background-color: #EF6C00; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🥞 BREAKFAST - Perfect Pancakes</div> |
-| Salad       | 🥬   | Dark Green   | `#1B5E20` | <div style="background-color: #1B5E20; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🥬 SALAD - Caesar Salad</div> |
-| Baking      | 🍞   | Brown        | `#6D4C41` | <div style="background-color: #6D4C41; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍞 BAKING - Sourdough Bread</div> |
-| Dessert     | 🍰   | Purple       | `#6A1B9A` | <div style="background-color: #6A1B9A; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍰 DESSERT - Chocolate Cake</div> |
-| Other       | 📝   | Blue Gray    | `#37474F` | <div style="background-color: #37474F; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">📝 OTHER - Special Recipe</div> |
+| Meat        | 🥩   | Deep Red     | `#CC3333` | <div style="background-color: #CC3333; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🥩 MEAT - Perfect Grilled Steak</div> |
+| Side        | 🥗   | Teal         | `#009999` | <div style="background-color: #009999; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🥗 SIDE - Roasted Vegetables</div> |
+| Main        | 🍽️   | Royal Blue   | `#3366CC` | <div style="background-color: #3366CC; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍽️ MAIN - Chicken Parmesan</div> |
+| Soup        | 🍲   | Burnt Orange | `#E66600` | <div style="background-color: #E66600; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍲 SOUP - Tomato Basil Soup</div> |
+| Sauce       | 🍯   | Indigo Purple| `#663399` | <div style="background-color: #663399; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍯 SAUCE - Hollandaise Sauce</div> |
+| Breakfast   | 🥞   | Amber/Gold   | `#D98C00` | <div style="background-color: #D98C00; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🥞 BREAKFAST - Perfect Pancakes</div> |
+| Salad       | 🥬   | Leaf Green   | `#009933` | <div style="background-color: #009933; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🥬 SALAD - Caesar Salad</div> |
+| Baking      | 🍞   | Chocolate Brown | `#734019` | <div style="background-color: #734019; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍞 BAKING - Sourdough Bread</div> |
+| Dessert     | 🍰   | Raspberry    | `#B33366` | <div style="background-color: #B33366; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">🍰 DESSERT - Chocolate Cake</div> |
+| Other       | 📝   | Dark Gray    | `#4D4D4D` | <div style="background-color: #4D4D4D; color: white; padding: 4px 8px; font-weight: bold; display: inline-block;">📝 OTHER - Special Recipe</div> |
 
+
+## 🥗 Nutrition Feature
+
+Automatically calculate and display nutrition facts on recipe cards using the USDA FoodData Central API:
+
+### Features
+- **6 Key Nutrients**: Calories, Protein, Carbohydrates, Fat, Fiber, and Sodium per serving
+- **USDA Database**: Access to comprehensive nutritional data for 350,000+ food items
+- **Automatic Enhancement**: Add nutrition data to existing recipes with one command
+- **Smart Layout**: Nutrition facts displayed alongside ingredients on front page
+
+### USDA API Key Setup
+**Required**: The nutrition feature requires a free USDA API key.
+
+1. **Get Your Free API Key**: Visit [https://fdc.nal.usda.gov/api-key-signup](https://fdc.nal.usda.gov/api-key-signup)
+2. **Set Environment Variable**:
+   ```bash
+   export USDA_API_KEY="your-usda-api-key-here"
+   ```
+3. **Add to your shell profile** (`.bashrc`, `.zshrc`, etc.) for persistence:
+   ```bash
+   echo 'export USDA_API_KEY="your-usda-api-key-here"' >> ~/.bashrc
+   ```
+
+### Usage
+```bash
+# Add nutrition to a single recipe
+python -m recipe_fmt.nutrition recipe/yaml/pancakes.yaml
+
+# Add nutrition to all recipes
+python -m recipe_fmt.nutrition recipe/yaml/*.yaml
+
+# Preview nutrition without modifying files
+python -m recipe_fmt.nutrition --dry-run recipe/yaml/pancakes.yaml
+```
+
+### Example Output
+The nutrition feature adds a clean nutrition facts section to your recipe cards:
+```
+                    NUTRITION FACTS
+                      Per Serving
+                    
+                    Calories: 824
+                    Protein: 32g
+                    Carbs: 136g
+                    Fat: 18g
+                    Fiber: 1g
+                    Sodium: 448mg
+```
+
+**Note**: Without a USDA API key, sample nutrition data will be displayed for demonstration purposes.
 
 ## 🤖 OpenAI Integration
 
@@ -241,15 +307,15 @@ ingredients:
     weight_grams: 100
     purpose: "binding"
 
-# Future nutrition feature (placeholder)
+# Automatically calculated nutrition (via USDA API)
 nutrition:
   per_serving:
-    calories: null      # Will be calculated from ingredients
-    protein_g: null
-    carbs_g: null
-    fat_g: null
-    fiber_g: null
-    sodium_mg: null
+    calories: 824
+    protein_g: 32
+    carbs_g: 136
+    fat_g: 18
+    fiber_g: 1
+    sodium_mg: 448
 
 instructions:
   - "Mix dry ingredients in large bowl"
@@ -281,6 +347,10 @@ Built with modern Python best practices and comprehensive tooling:
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+
+# Set up API keys for full functionality
+export OPENAI_API_KEY="your-openai-key"
+export USDA_API_KEY="your-usda-key"  # Get free: https://fdc.nal.usda.gov/api-key-signup
 
 # Run quality checks
 make lint        # Code formatting and linting
