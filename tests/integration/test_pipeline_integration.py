@@ -486,6 +486,7 @@ class TestPipelineIntegrationConfiguration:
         with patch("recipe_fmt.pipeline.FileManager") as mock_file_manager_class:
             mock_file_manager = Mock()
             mock_file_manager.ensure_directories_exist.return_value = True
+            mock_file_manager.get_cfg.return_value = {"force_rebuild": False}
 
             # In normal mode, should not process (YAML is newer)
             mock_file_manager.get_stale_pipeline_files.return_value = {
@@ -508,11 +509,19 @@ class TestPipelineIntegrationConfiguration:
                 "yaml_to_pdf": [],
             }
 
-            with patch("recipe_fmt.pipeline.OpenAIClient") as mock_openai_client_class:
+            with patch("recipe_fmt.parsers.markdown_parser.OpenAIClient") as mock_openai_client_class:
                 mock_client = Mock()
                 mock_client.parse_recipe_markdown.return_value = OpenAIResponse(
                     success=True,
-                    data={"content": "title: Rebuilt"},
+                    data={"content": """title: Rebuilt Recipe
+category: Other
+servings: 1
+ingredients:
+  - ingredient: test
+    amount: 1
+    unit: cup
+instructions:
+  - Mix ingredients"""},
                     tokens_used=50,
                     cost_estimate=0.001,
                 )

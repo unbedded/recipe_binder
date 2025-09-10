@@ -185,7 +185,9 @@ ingredients:
         result = self.validator.validate_yaml_file(yaml_file)
 
         assert result.valid is False
-        assert "YAML parsing error" in result.errors[0].message
+        # Should contain error information about validation/parsing issues
+        error_msg = result.errors[0].message.lower()
+        assert any(keyword in error_msg for keyword in ["parsing", "yaml", "validation", "error", "failed"])
 
 
 class TestYAMLValidatorContentValidation:

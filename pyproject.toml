@@ -25,6 +25,7 @@ dependencies = [
     "PyYAML>=6.0",
     "pathlib-mate>=1.0",
     "typing-extensions>=4.0",
+    "requests>=2.25.0",
 ]
 
 [project.optional-dependencies]

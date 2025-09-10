@@ -1,5 +1,6 @@
 # Default Recipe Card Template
-# This template defines the layout and styling for recipe cards
+# This template defines the layout, typography, and UI styling for recipe cards
+# Category colors and icons are hardcoded in the PDF generator for consistency
 
 template_info:
   name: "Default Recipe Card"
@@ -88,7 +89,7 @@ display:
   show_purpose: true
   show_category_banner: true
   show_metadata: true
-  show_description: true
+  show_description: false
   show_notes: true
 
   # Ingredient table configuration
@@ -124,21 +125,11 @@ display:
       padding: 3
       border: false
 
-# Color scheme (uses category colors from CategoryColors class)
+# Color scheme
+# NOTE: Category colors and icons are hardcoded in CategoryColors class (src/recipe_fmt/generators/pdf_generator.py)
+# This ensures consistent colors across all generated cards and simplifies template maintenance
 colors:
-  category_colors:
-    Meat: "#CC3333"        # Deep Red
-    Side: "#66CC66"        # Light Green
-    Main: "#3366CC"        # Royal Blue
-    Soup: "#FF9933"        # Orange
-    Sauce: "#9966CC"       # Purple
-    Breakfast: "#FFCC33"   # Golden Yellow
-    Salad: "#33CC33"       # Fresh Green
-    Baking: "#CC9966"      # Warm Brown
-    Dessert: "#CC6699"     # Pink
-    Other: "#999999"       # Gray
-
-  # Additional color definitions
+  # Layout and UI colors
   text:
     primary: "#000000"
     secondary: "#666666"
@@ -236,7 +227,3 @@ advanced:
   print_scaling: "none"
   duplex: "short_edge"  # For two-sided printing
 
-  # Height estimation buffers for adaptive font sizing
-  height_estimation:
-    table_safety_buffer: 1.3    # 30% buffer for table height estimation
-    paragraph_safety_buffer: 1.8 # 30% buffer for paragraph height estimation
