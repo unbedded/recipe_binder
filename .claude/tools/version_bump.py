@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""<DATE>2025-09-08</DATE>
+"""<DATE>2025-09-08</DATE>.
 
 PEP 440 compliant version management tool with GitFlow integration.
 
@@ -158,9 +158,7 @@ class VersionBumper:
             # Check shortcuts
             pre_release = PRE_RELEASE_SHORTCUTS.get(pre_release, pre_release)
             if pre_release not in VALID_PRE_RELEASE_TYPES:
-                raise ValueError(
-                    f"Invalid pre-release type: {pre_release}. Must be one of {VALID_PRE_RELEASE_TYPES}"
-                )
+                raise ValueError(f"Invalid pre-release type: {pre_release}. Must be one of {VALID_PRE_RELEASE_TYPES}")
 
         # STEP_6: Parse current version and apply bump
         components = self.parse_version(current)
@@ -285,9 +283,7 @@ class VersionBumper:
         Returns:
             New version string
         """
-        self.logger.info(
-            "Starting version bump: bump_type=%s, pre_release=%s", bump_type, pre_release
-        )
+        self.logger.info("Starting version bump: bump_type=%s, pre_release=%s", bump_type, pre_release)
 
         # STEP_8: Execute complete workflow
         current_version = self.read_current_version()
@@ -328,9 +324,7 @@ Examples:
         """,
     )
 
-    parser.add_argument(
-        "--bump", required=True, choices=VALID_BUMP_TYPES, help="Type of version bump to perform"
-    )
+    parser.add_argument("--bump", required=True, choices=VALID_BUMP_TYPES, help="Type of version bump to perform")
 
     parser.add_argument(
         "--pre-release",

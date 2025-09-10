@@ -5,8 +5,7 @@ across all OpenAI client tests. Includes successful responses, error scenarios,
 and edge cases for thorough testing coverage.
 """
 
-from typing import Dict, Any, List, Optional
-import json
+from typing import Any
 from unittest.mock import Mock
 
 # Successful OpenAI Parse Response - Perfect Pancakes
@@ -21,7 +20,7 @@ SUCCESSFUL_PARSE_RESPONSE = {
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": '''```yaml
+                    "content": """```yaml
 title: "Perfect Pancakes"
 category: "Breakfast"
 description: "Fluffy buttermilk pancakes that are perfect for weekend mornings"
@@ -82,16 +81,12 @@ tags:
   - "weekend"
   - "family-friendly"
 source: "Family Recipe Collection"
-```'''
+```""",
                 },
-                "finish_reason": "stop"
+                "finish_reason": "stop",
             }
         ],
-        "usage": {
-            "prompt_tokens": 150,
-            "completion_tokens": 420,
-            "total_tokens": 570
-        }
+        "usage": {"prompt_tokens": 150, "completion_tokens": 420, "total_tokens": 570},
     },
     "parsed_yaml": {
         "title": "Perfect Pancakes",
@@ -107,50 +102,50 @@ source: "Family Recipe Collection"
                 "amount": 2.0,
                 "unit": "cups",
                 "weight_grams": 240,
-                "purpose": "base"
+                "purpose": "base",
             },
             {
                 "ingredient": "granulated sugar",
                 "amount": 2.0,
                 "unit": "TBL",
                 "weight_grams": 25,
-                "purpose": "sweetening"
+                "purpose": "sweetening",
             },
             {
                 "ingredient": "baking powder",
                 "amount": 2.0,
                 "unit": "tsp",
                 "weight_grams": 8,
-                "purpose": "leavening"
+                "purpose": "leavening",
             },
             {
                 "ingredient": "salt",
                 "amount": 1.0,
                 "unit": "tsp",
                 "weight_grams": 5,
-                "purpose": "flavor enhancement"
+                "purpose": "flavor enhancement",
             },
             {
                 "ingredient": "buttermilk",
                 "amount": 1.5,
                 "unit": "cups",
                 "weight_grams": 360,
-                "purpose": "liquid"
+                "purpose": "liquid",
             },
             {
                 "ingredient": "large eggs",
                 "amount": 2.0,
                 "unit": "whole",
                 "weight_grams": 100,
-                "purpose": "binding"
+                "purpose": "binding",
             },
             {
                 "ingredient": "unsalted butter",
                 "amount": 4.0,
                 "unit": "TBL",
                 "weight_grams": 56,
-                "purpose": "fat"
-            }
+                "purpose": "fat",
+            },
         ],
         "instructions": [
             "In a large bowl, whisk together flour, sugar, baking powder, and salt.",
@@ -159,22 +154,17 @@ source: "Family Recipe Collection"
             "Heat a griddle or large skillet over medium heat. Lightly grease with butter or oil.",
             "Pour 1/4 cup batter for each pancake. Cook until bubbles form on surface and edges look set, about 2-3 minutes.",
             "Flip and cook until golden brown on other side, 1-2 minutes more.",
-            "Serve immediately with butter and maple syrup."
+            "Serve immediately with butter and maple syrup.",
         ],
         "notes": [
             "Don't overmix the batter - lumpy is good!",
-            "Keep cooked pancakes warm in 200°F oven"
+            "Keep cooked pancakes warm in 200°F oven",
         ],
-        "tags": [
-            "breakfast",
-            "pancakes",
-            "weekend",
-            "family-friendly"
-        ],
-        "source": "Family Recipe Collection"
+        "tags": ["breakfast", "pancakes", "weekend", "family-friendly"],
+        "source": "Family Recipe Collection",
     },
     "tokens_used": 570,
-    "cost_estimate": 0.0171
+    "cost_estimate": 0.0171,
 }
 
 # Error Response - API Rate Limit
@@ -183,9 +173,9 @@ ERROR_RATE_LIMIT_RESPONSE = {
         "message": "Rate limit reached for requests",
         "type": "rate_limit_error",
         "param": None,
-        "code": None
+        "code": None,
     },
-    "status_code": 429
+    "status_code": 429,
 }
 
 # Error Response - Invalid API Key
@@ -194,9 +184,9 @@ ERROR_INVALID_KEY_RESPONSE = {
         "message": "Invalid API key provided",
         "type": "invalid_request_error",
         "param": None,
-        "code": "invalid_api_key"
+        "code": "invalid_api_key",
     },
-    "status_code": 401
+    "status_code": 401,
 }
 
 # Error Response - Content Policy Violation
@@ -205,9 +195,9 @@ ERROR_CONTENT_POLICY_RESPONSE = {
         "message": "Your request was rejected as a result of our safety system",
         "type": "invalid_request_error",
         "param": None,
-        "code": "content_policy_violation"
+        "code": "content_policy_violation",
     },
-    "status_code": 400
+    "status_code": 400,
 }
 
 # Error Response - Server Error
@@ -216,9 +206,9 @@ ERROR_SERVER_RESPONSE = {
         "message": "The server had an error while processing your request",
         "type": "server_error",
         "param": None,
-        "code": None
+        "code": None,
     },
-    "status_code": 500
+    "status_code": 500,
 }
 
 # Partial Parse Response - Missing Some Fields
@@ -233,7 +223,7 @@ PARTIAL_PARSE_RESPONSE = {
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": '''```yaml
+                    "content": """```yaml
 title: "Incomplete Recipe"
 category: "Other"
 ingredients:
@@ -243,34 +233,21 @@ ingredients:
 instructions:
   - "Mix ingredients"
   - "Cook until done"
-```'''
+```""",
                 },
-                "finish_reason": "stop"
+                "finish_reason": "stop",
             }
         ],
-        "usage": {
-            "prompt_tokens": 100,
-            "completion_tokens": 80,
-            "total_tokens": 180
-        }
+        "usage": {"prompt_tokens": 100, "completion_tokens": 80, "total_tokens": 180},
     },
     "parsed_yaml": {
         "title": "Incomplete Recipe",
         "category": "Other",
-        "ingredients": [
-            {
-                "ingredient": "flour",
-                "amount": 2.0,
-                "unit": "cups"
-            }
-        ],
-        "instructions": [
-            "Mix ingredients",
-            "Cook until done"
-        ]
+        "ingredients": [{"ingredient": "flour", "amount": 2.0, "unit": "cups"}],
+        "instructions": ["Mix ingredients", "Cook until done"],
     },
     "tokens_used": 180,
-    "cost_estimate": 0.0054
+    "cost_estimate": 0.0054,
 }
 
 # Malformed YAML Response
@@ -285,7 +262,7 @@ MALFORMED_YAML_RESPONSE = {
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": '''```yaml
+                    "content": """```yaml
 title: "Malformed Recipe"
 category: "Breakfast
 ingredients:
@@ -298,20 +275,16 @@ ingredients:
 instructions:
   - "This YAML is malformed"
   - "Missing closing quotes
-```'''
+```""",
                 },
-                "finish_reason": "stop"
+                "finish_reason": "stop",
             }
         ],
-        "usage": {
-            "prompt_tokens": 120,
-            "completion_tokens": 95,
-            "total_tokens": 215
-        }
+        "usage": {"prompt_tokens": 120, "completion_tokens": 95, "total_tokens": 215},
     },
     "yaml_error": "YAML parsing error: invalid syntax",
     "tokens_used": 215,
-    "cost_estimate": 0.00645
+    "cost_estimate": 0.00645,
 }
 
 # Response with No YAML Markers
@@ -326,20 +299,16 @@ NO_YAML_MARKERS_RESPONSE = {
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": "I'm sorry, but I cannot parse this recipe as it seems to be incomplete or malformed. Please provide a properly formatted recipe with clear ingredients and instructions."
+                    "content": "I'm sorry, but I cannot parse this recipe as it seems to be incomplete or malformed. Please provide a properly formatted recipe with clear ingredients and instructions.",
                 },
-                "finish_reason": "stop"
+                "finish_reason": "stop",
             }
         ],
-        "usage": {
-            "prompt_tokens": 80,
-            "completion_tokens": 35,
-            "total_tokens": 115
-        }
+        "usage": {"prompt_tokens": 80, "completion_tokens": 35, "total_tokens": 115},
     },
     "error": "No YAML content found in response",
     "tokens_used": 115,
-    "cost_estimate": 0.00345
+    "cost_estimate": 0.00345,
 }
 
 # Very Large Response - For testing limits
@@ -354,7 +323,7 @@ LARGE_RECIPE_RESPONSE = {
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": f'''```yaml
+                    "content": f"""```yaml
 title: "Complex Multi-Course Meal"
 category: "Other"
 description: "A very complex recipe with many steps and ingredients"
@@ -363,26 +332,22 @@ cook_time_minutes: 240
 servings: 20
 difficulty: "Hard"
 ingredients:
-{chr(10).join([f'  - ingredient: "ingredient_{i}"' + chr(10) + f'    amount: {i}.0' + chr(10) + f'    unit: "unit_{i}"' for i in range(1, 101)])}
+{chr(10).join([f'  - ingredient: "ingredient_{i}"' + chr(10) + f"    amount: {i}.0" + chr(10) + f'    unit: "unit_{i}"' for i in range(1, 101)])}
 instructions:
 {chr(10).join([f'  - "Step {i}: Very detailed instruction with lots of explanation about technique, timing, and what to look for during this step of the cooking process."' for i in range(1, 151)])}
 notes:
 {chr(10).join([f'  - "Note {i}: Additional information and tips"' for i in range(1, 51)])}
 tags:
 {chr(10).join([f'  - "tag_{i}"' for i in range(1, 21)])}
-```'''
+```""",
                 },
-                "finish_reason": "stop"
+                "finish_reason": "stop",
             }
         ],
-        "usage": {
-            "prompt_tokens": 200,
-            "completion_tokens": 4500,
-            "total_tokens": 4700
-        }
+        "usage": {"prompt_tokens": 200, "completion_tokens": 4500, "total_tokens": 4700},
     },
     "tokens_used": 4700,
-    "cost_estimate": 0.141
+    "cost_estimate": 0.141,
 }
 
 # Response with Unicode Characters
@@ -397,7 +362,7 @@ UNICODE_RECIPE_RESPONSE = {
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": '''```yaml
+                    "content": """```yaml
 title: "Café Français ☕"
 category: "Breakfast"
 description: "Traditional French café with crème"
@@ -432,16 +397,12 @@ tags:
   - "petit-déjeuner"
   - "boisson"
 source: "Café de Paris"
-```'''
+```""",
                 },
-                "finish_reason": "stop"
+                "finish_reason": "stop",
             }
         ],
-        "usage": {
-            "prompt_tokens": 120,
-            "completion_tokens": 280,
-            "total_tokens": 400
-        }
+        "usage": {"prompt_tokens": 120, "completion_tokens": 280, "total_tokens": 400},
     },
     "parsed_yaml": {
         "title": "Café Français ☕",
@@ -452,45 +413,30 @@ source: "Café de Paris"
         "servings": 2,
         "difficulty": "Easy",
         "ingredients": [
-            {
-                "ingredient": "café noir",
-                "amount": 2.0,
-                "unit": "tasses",
-                "weight_grams": 480
-            },
-            {
-                "ingredient": "crème fraîche",
-                "amount": 50.0,
-                "unit": "ml",
-                "weight_grams": 50
-            },
+            {"ingredient": "café noir", "amount": 2.0, "unit": "tasses", "weight_grams": 480},
+            {"ingredient": "crème fraîche", "amount": 50.0, "unit": "ml", "weight_grams": 50},
             {
                 "ingredient": "sucre blanc",
                 "amount": 2.0,
                 "unit": "cuillères à café",
-                "weight_grams": 8
-            }
+                "weight_grams": 8,
+            },
         ],
         "instructions": [
             "Chauffez l'eau à 85°C",
             "Versez sur le café moulu",
             "Laissez infuser 3 minutes ⏱️",
-            "Ajoutez la crème et le sucre selon goût"
+            "Ajoutez la crème et le sucre selon goût",
         ],
         "notes": [
             "Température optimale: 85°C (185°F)",
-            "Utilisez des grains fraîchement moulus ☕"
+            "Utilisez des grains fraîchement moulus ☕",
         ],
-        "tags": [
-            "café",
-            "français",
-            "petit-déjeuner",
-            "boisson"
-        ],
-        "source": "Café de Paris"
+        "tags": ["café", "français", "petit-déjeuner", "boisson"],
+        "source": "Café de Paris",
     },
     "tokens_used": 400,
-    "cost_estimate": 0.012
+    "cost_estimate": 0.012,
 }
 
 # Collection of all mock responses
@@ -504,23 +450,21 @@ ALL_MOCK_RESPONSES = {
     "malformed_yaml": MALFORMED_YAML_RESPONSE,
     "no_yaml_markers": NO_YAML_MARKERS_RESPONSE,
     "large_recipe": LARGE_RECIPE_RESPONSE,
-    "unicode_recipe": UNICODE_RECIPE_RESPONSE
+    "unicode_recipe": UNICODE_RECIPE_RESPONSE,
 }
 
+
 def create_mock_openai_response(
-    content: str,
-    tokens_used: int = 100,
-    model: str = "gpt-4",
-    finish_reason: str = "stop"
+    content: str, tokens_used: int = 100, model: str = "gpt-4", finish_reason: str = "stop"
 ) -> Mock:
     """Create a mock OpenAI response object.
-    
+
     Args:
         content: The response content
         tokens_used: Number of tokens used
         model: Model name used
         finish_reason: Finish reason for the response
-        
+
     Returns:
         Mock OpenAI response object
     """
@@ -529,134 +473,125 @@ def create_mock_openai_response(
     mock_response.object = "chat.completion"
     mock_response.created = 1677652288
     mock_response.model = model
-    
+
     # Mock choices
     mock_choice = Mock()
     mock_choice.index = 0
     mock_choice.finish_reason = finish_reason
-    
+
     # Mock message
     mock_message = Mock()
     mock_message.role = "assistant"
     mock_message.content = content
     mock_choice.message = mock_message
-    
+
     mock_response.choices = [mock_choice]
-    
+
     # Mock usage
     mock_usage = Mock()
     mock_usage.prompt_tokens = max(10, tokens_used // 4)
     mock_usage.completion_tokens = tokens_used - mock_usage.prompt_tokens
     mock_usage.total_tokens = tokens_used
     mock_response.usage = mock_usage
-    
+
     return mock_response
 
-def create_mock_error_response(
-    error_message: str,
-    error_type: str = "api_error",
-    status_code: int = 500
-) -> Exception:
+
+def create_mock_error_response(error_message: str, error_type: str = "api_error", status_code: int = 500) -> Exception:
     """Create a mock OpenAI error response.
-    
+
     Args:
         error_message: Error message
         error_type: Type of error
         status_code: HTTP status code
-        
+
     Returns:
         Exception that mimics OpenAI errors
     """
     from openai import APIError
-    
+
     error = APIError(error_message)
     error.status_code = status_code
     error.type = error_type
     return error
 
-def get_mock_response_by_content_type(content_type: str) -> Dict[str, Any]:
+
+def get_mock_response_by_content_type(content_type: str) -> dict[str, Any]:
     """Get mock response by content type for testing different scenarios.
-    
+
     Args:
         content_type: Type of content to mock
-        
+
     Returns:
         Mock response data dictionary
-        
+
     Raises:
         KeyError: If content type not found
     """
     if content_type not in ALL_MOCK_RESPONSES:
         raise KeyError(f"Mock response type '{content_type}' not found. Available: {list(ALL_MOCK_RESPONSES.keys())}")
-    
+
     return ALL_MOCK_RESPONSES[content_type]
 
+
 def create_retry_sequence_responses(
-    failure_count: int,
-    final_success: bool = True,
-    error_type: str = "rate_limit_error"
-) -> List[Any]:
+    failure_count: int, final_success: bool = True, error_type: str = "rate_limit_error"
+) -> list[Any]:
     """Create a sequence of responses for testing retry logic.
-    
+
     Args:
         failure_count: Number of failures before success
         final_success: Whether final attempt should succeed
         error_type: Type of error for failures
-        
+
     Returns:
         List of mock responses/exceptions
     """
     responses = []
-    
+
     # Add failure responses
     for i in range(failure_count):
         if error_type == "rate_limit_error":
-            responses.append(create_mock_error_response(
-                "Rate limit reached", "rate_limit_error", 429
-            ))
+            responses.append(create_mock_error_response("Rate limit reached", "rate_limit_error", 429))
         elif error_type == "server_error":
-            responses.append(create_mock_error_response(
-                "Server error", "server_error", 500
-            ))
+            responses.append(create_mock_error_response("Server error", "server_error", 500))
         else:
-            responses.append(create_mock_error_response(
-                f"API error {i}", error_type, 400
-            ))
-    
+            responses.append(create_mock_error_response(f"API error {i}", error_type, 400))
+
     # Add final response
     if final_success:
-        responses.append(create_mock_openai_response(
-            SUCCESSFUL_PARSE_RESPONSE["raw_response"]["choices"][0]["message"]["content"],
-            570
-        ))
+        responses.append(
+            create_mock_openai_response(
+                SUCCESSFUL_PARSE_RESPONSE["raw_response"]["choices"][0]["message"]["content"], 570
+            )
+        )
     else:
-        responses.append(create_mock_error_response(
-            "Final failure", "api_error", 500
-        ))
-    
+        responses.append(create_mock_error_response("Final failure", "api_error", 500))
+
     return responses
 
-def create_caching_test_responses() -> Dict[str, Mock]:
+
+def create_caching_test_responses() -> dict[str, Mock]:
     """Create responses specifically for testing caching behavior.
-    
+
     Returns:
         Dictionary of mock responses for caching tests
     """
     # Same content but different response objects to test caching
     content = SUCCESSFUL_PARSE_RESPONSE["raw_response"]["choices"][0]["message"]["content"]
-    
+
     return {
         "first_request": create_mock_openai_response(content, 570, "gpt-4"),
         "cache_hit": create_mock_openai_response(content, 570, "gpt-4"),
         "different_content": create_mock_openai_response(
-            PARTIAL_PARSE_RESPONSE["raw_response"]["choices"][0]["message"]["content"],
-            180, "gpt-4"
-        )
+            PARTIAL_PARSE_RESPONSE["raw_response"]["choices"][0]["message"]["content"], 180, "gpt-4"
+        ),
     }
 
-def create_cost_calculation_responses() -> List[Dict[str, Any]]:
+
+def create_cost_calculation_responses() -> list[dict[str, Any]]:
     """Create responses with different token counts for cost calculation testing.
-    
+
     Returns:
         List of response data for cost testing
     """
@@ -664,23 +599,24 @@ def create_cost_calculation_responses() -> List[Dict[str, Any]]:
         {
             "tokens": 100,
             "expected_cost": 0.003,
-            "response": create_mock_openai_response("Short response", 100)
+            "response": create_mock_openai_response("Short response", 100),
         },
         {
             "tokens": 1000,
             "expected_cost": 0.03,
-            "response": create_mock_openai_response("Medium response", 1000)
+            "response": create_mock_openai_response("Medium response", 1000),
         },
         {
             "tokens": 5000,
             "expected_cost": 0.15,
-            "response": create_mock_openai_response("Long response", 5000)
-        }
+            "response": create_mock_openai_response("Long response", 5000),
+        },
     ]
 
-def create_markdown_input_samples() -> Dict[str, str]:
+
+def create_markdown_input_samples() -> dict[str, str]:
     """Create sample markdown inputs for testing different parsing scenarios.
-    
+
     Returns:
         Dictionary of markdown content samples
     """
@@ -723,10 +659,10 @@ def create_markdown_input_samples() -> Dict[str, str]:
         "malformed_recipe": """# Incomplete Recipe
 ## Ingredients
 - flour
-- 
+-
 ## Instructions
 1. Mix
-2. 
+2.
 """,
         "empty_content": "",
         "no_ingredients": """# Recipe Without Ingredients
@@ -751,27 +687,28 @@ def create_markdown_input_samples() -> Dict[str, str]:
 1. Préparez le café à 85°C
 2. Chauffez le lait sans bouillir
 3. Mélangez délicatement
-"""
+""",
     }
+
 
 # Export commonly used test data
 __all__ = [
-    'SUCCESSFUL_PARSE_RESPONSE',
-    'ERROR_RATE_LIMIT_RESPONSE',
-    'ERROR_INVALID_KEY_RESPONSE', 
-    'ERROR_CONTENT_POLICY_RESPONSE',
-    'ERROR_SERVER_RESPONSE',
-    'PARTIAL_PARSE_RESPONSE',
-    'MALFORMED_YAML_RESPONSE',
-    'NO_YAML_MARKERS_RESPONSE',
-    'LARGE_RECIPE_RESPONSE',
-    'UNICODE_RECIPE_RESPONSE',
-    'ALL_MOCK_RESPONSES',
-    'create_mock_openai_response',
-    'create_mock_error_response',
-    'get_mock_response_by_content_type',
-    'create_retry_sequence_responses',
-    'create_caching_test_responses',
-    'create_cost_calculation_responses',
-    'create_markdown_input_samples'
+    "SUCCESSFUL_PARSE_RESPONSE",
+    "ERROR_RATE_LIMIT_RESPONSE",
+    "ERROR_INVALID_KEY_RESPONSE",
+    "ERROR_CONTENT_POLICY_RESPONSE",
+    "ERROR_SERVER_RESPONSE",
+    "PARTIAL_PARSE_RESPONSE",
+    "MALFORMED_YAML_RESPONSE",
+    "NO_YAML_MARKERS_RESPONSE",
+    "LARGE_RECIPE_RESPONSE",
+    "UNICODE_RECIPE_RESPONSE",
+    "ALL_MOCK_RESPONSES",
+    "create_mock_openai_response",
+    "create_mock_error_response",
+    "get_mock_response_by_content_type",
+    "create_retry_sequence_responses",
+    "create_caching_test_responses",
+    "create_cost_calculation_responses",
+    "create_markdown_input_samples",
 ]

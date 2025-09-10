@@ -24,18 +24,71 @@ clean: ## Remove all generated PDF files and cache
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	@echo "✅ Clean complete!"
 
-build: recipe/pdf/.timestamp ## Process all recipes through the pipeline (with dependency tracking)
+build: build-pdfs ## Process all recipes with incremental dependencies
 	@echo "✅ Build complete! Check recipe/pdf/ for generated cards."
 
-# Timestamp-based dependency tracking - only rebuilds when YAML or template files change
-recipe/pdf/.timestamp: $(wildcard recipe/yaml/*.yaml) recipe/templates/default-card.yaml | recipe/pdf
-	@echo "🚀 Building recipe cards..."
-	python -m recipe_fmt.pipeline --log-level INFO
-	@touch $@
+build-pdfs: recipe/pdf/Dessert-chocolate-chip-cookies.pdf \
+           recipe/pdf/Dessert-chocolate-avocado-mousse.pdf \
+           recipe/pdf/Main-thai-basil-chicken.pdf \
+           recipe/pdf/Baking-homemade-pizza-dough.pdf \
+           recipe/pdf/Baking-garlic-herb-bread.pdf \
+           recipe/pdf/Salad-green-goddess-salad.pdf \
+           recipe/pdf/Breakfast-perfect-pancakes.pdf
 
-# Ensure PDF directory exists
+# Incremental dependencies - like code compilation!
+# Each category gets its own rule for proper dependency tracking
+
+recipe/pdf/Dessert-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Dessert recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Main-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Main recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Baking-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Baking recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Breakfast-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Breakfast recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Salad-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Salad recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Soup-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Soup recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Side-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Side recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Sauce-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Sauce recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Meat-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Meat recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+recipe/pdf/Other-%.pdf: recipe/yaml/%.yaml recipe/templates/default-card.yaml | recipe/pdf
+	@echo "🚀 Building Other recipe: $*"
+	python -m recipe_fmt.pipeline --yaml-to-pdf $< --log-level INFO
+
+# Markdown to YAML conversion rules
+recipe/yaml/%.yaml: recipe/markdown/%.md | recipe/yaml
+	@echo "🔄 Converting markdown to YAML: $*"
+	python -m recipe_fmt.pipeline --md-to-yaml $< --log-level INFO
+
+# Ensure directories exist
 recipe/pdf:
 	@mkdir -p recipe/pdf
+
+recipe/yaml:
+	@mkdir -p recipe/yaml
 
 demo: ## Generate demo recipe cards
 	@echo "🍳 Creating demo recipes..."
