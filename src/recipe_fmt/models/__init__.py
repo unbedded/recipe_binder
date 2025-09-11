@@ -18,7 +18,7 @@ Example usage:
     config = AppConfig()
 """
 
-from .config import AppConfig, DisplayConfig, OpenAIConfig, TemplateConfig
+from .config import AppConfig, DisplayConfig, OpenAIConfig
 from .recipe import Ingredient, Nutrition, Recipe
 
 __all__ = [
@@ -28,5 +28,4 @@ __all__ = [
     "AppConfig",
     "DisplayConfig",
     "OpenAIConfig",
-    "TemplateConfig",
 ]

@@ -154,10 +154,24 @@ class BaseLayoutStrategy(ComponentBase, ILayoutStrategy):
             return []
 
         try:
-            # TODO: Create ContentConfig from context
-            from ..types import ContentConfig, ContentSection
+            from ..types import ContentConfig, ContentSection, StyleSpec
 
-            config = ContentConfig(section=ContentSection(section_name))
+            # Create ContentConfig from context with proper style and configuration
+            section_enum = (
+                ContentSection(section_name.lower())
+                if hasattr(ContentSection, section_name.upper())
+                else ContentSection.METADATA
+            )
+
+            # Use context-aware style configuration
+            style = StyleSpec(font_name="Helvetica", font_size=11, alignment="left", color="black")
+
+            config = ContentConfig(
+                section=section_enum,
+                style=style,
+                show_section=True,
+                custom_data={"context_width": context.content_width, "context_height": context.content_height},
+            )
 
             result = builder.build_content(context, config)
             if result.success:

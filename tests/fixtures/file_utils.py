@@ -4,7 +4,6 @@ This module provides utilities for creating temporary files, mock file systems,
 and file I/O testing scenarios that can be used across all test modules.
 """
 
-import json
 import logging
 import shutil
 import tempfile
@@ -43,7 +42,6 @@ class MockFileSystem:
         self.yaml_dir = self.recipe_dir / "yaml"
         self.pdf_dir = self.recipe_dir / "pdf"
         self.templates_dir = self.recipe_dir / "templates"
-        self.config_dir = self.recipe_dir / "config"
 
         # Create directories
         for directory in [
@@ -51,7 +49,6 @@ class MockFileSystem:
             self.yaml_dir,
             self.pdf_dir,
             self.templates_dir,
-            self.config_dir,
         ]:
             directory.mkdir(parents=True, exist_ok=True)
 
@@ -111,43 +108,13 @@ class MockFileSystem:
 
         return created_files
 
-    def create_config_files(self, configs: dict[str, dict[str, Any]]) -> dict[str, Path]:
-        """Create configuration files.
-
-        Args:
-            configs: Dictionary mapping filename to config data
-
-        Returns:
-            Dictionary mapping filename to created file path
-        """
-        created_files = {}
-
-        for filename, config_data in configs.items():
-            file_path = self.config_dir / filename
-
-            # Determine format and write file
-            if filename.endswith(".json"):
-                with open(file_path, "w", encoding="utf-8") as f:
-                    json.dump(config_data, f, indent=2)
-            elif filename.endswith((".yaml", ".yml")):
-                with open(file_path, "w", encoding="utf-8") as f:
-                    yaml.dump(config_data, f, default_flow_style=False)
-            else:
-                # Assume text format
-                file_path.write_text(str(config_data), encoding="utf-8")
-
-            created_files[filename] = file_path
-            self.logger.debug("Created config file: %s", file_path)
-
-        return created_files
-
     def create_sample_files(self) -> dict[str, dict[str, Path]]:
         """Create all sample files from fixtures.
 
         Returns:
             Dictionary with categories of created files
         """
-        created = {"recipes": {}, "templates": {}, "configs": {}}
+        created = {"recipes": {}, "templates": {}}
 
         # Create sample recipe markdown files
         markdown_files = {}
@@ -167,23 +134,6 @@ class MockFileSystem:
             if isinstance(data, dict):
                 template_files[f"{name}.yaml"] = data
         created["templates"] = self.create_template_files(template_files)
-
-        # Create sample config files
-        config_files = {
-            "display_config.yaml": {
-                "show_weights": True,
-                "show_purpose": True,
-                "font_family": "Helvetica",
-                "color_scheme": "default",
-            },
-            "pipeline_config.json": {
-                "force_rebuild": False,
-                "batch_size": 10,
-                "parallel_processing": True,
-                "cache_openai_responses": True,
-            },
-        }
-        created["configs"] = self.create_config_files(config_files)
 
         return created
 
@@ -333,7 +283,6 @@ class MockFileSystem:
             self.yaml_dir,
             self.pdf_dir,
             self.templates_dir,
-            self.config_dir,
         ]:
             rel_name = directory.relative_to(self.base_path)
             if directory.exists():

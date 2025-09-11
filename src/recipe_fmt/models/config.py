@@ -57,25 +57,6 @@ class OpenAIConfig(BaseSettings):
     model_config = {"env_prefix": "OPENAI_", "case_sensitive": False}
 
 
-class TemplateConfig(BaseSettings):
-    """Configuration for PDF template settings."""
-
-    default_template: str = Field("default_card", description="Default template name")
-    card_width: float = Field(8.5, description="Card width in inches")
-    card_height: float = Field(4.0, description="Card height in inches")
-    margin_lr: float = Field(0.3, description="Left/right margins in inches")
-    margin_tb: float = Field(0.15, description="Top/bottom margins in inches")
-    header_height: float = Field(0.4, description="Header banner height in inches")
-
-    # Font settings
-    title_font_size: int = Field(16, ge=8, le=24, description="Title font size in points")
-    category_font_size: int = Field(12, ge=8, le=16, description="Category font size in points")
-    body_font_size: int = Field(11, ge=8, le=14, description="Body text font size in points")
-    instruction_font_size: int = Field(12, ge=8, le=16, description="Instruction font size in points")
-
-    model_config = {"env_prefix": "RECIPE_TEMPLATE_", "case_sensitive": False}
-
-
 class AppConfig(BaseSettings):
     """Main application configuration combining all settings."""
 
@@ -86,7 +67,6 @@ class AppConfig(BaseSettings):
     # Component configurations
     display: DisplayConfig | None = Field(None, description="Display configuration")
     openai: OpenAIConfig | None = Field(None, description="OpenAI configuration")
-    template: TemplateConfig | None = Field(None, description="Template configuration")
 
     def __init__(self, **kwargs):
         """Initialize with sub-configs to avoid env variable conflicts."""
@@ -95,8 +75,6 @@ class AppConfig(BaseSettings):
             kwargs["display"] = DisplayConfig()
         if "openai" not in kwargs:
             kwargs["openai"] = OpenAIConfig()
-        if "template" not in kwargs:
-            kwargs["template"] = TemplateConfig()
         super().__init__(**kwargs)
 
     @field_validator("log_level")
