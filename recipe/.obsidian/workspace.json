@@ -12,14 +12,10 @@
             "id": "badb5a8c8e3645f7",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "markdown/Rhubarb.Strawberry.Blackberry.Cobbler.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Rhubarb.Strawberry.Blackberry.Cobbler"
+              "title": "New tab"
             }
           }
         ]
@@ -187,31 +183,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "badb5a8c8e3645f7",
+  "active": "d383ea0cada010a3",
   "lastOpenFiles": [
-    "pdf/Main-pot_pie_chicken.pdf",
-    "pdf/Dessert-Rhubarb–Strawberry–Blackberry-Cobbler.pdf",
-    "pdf/Dessert-keto-strawberry-shortcake.pdf",
-    "pdf/Dessert-chocolate-avocado-mousse.pdf",
-    "pdf/Dessert-Apple_Crisp_w_Oat_topping.pdf",
-    "pdf/Breakfast-perfect-pancakes.pdf",
-    "pdf/Baking-Pizza_Dough.pdf",
-    "pdf/Baking-garlic-herb-bread.pdf",
-    "pdf/Baking-CinnamonRolls.pdf",
-    "pdf/Baking-homemade-pizza-dough.pdf",
-    "pdf/Salad-green-goddess-salad.pdf",
-    "markdown/dutch_baby.md",
-    "markdown/green-goddess-salad.md",
-    "markdown/meatloaf.md",
-    "markdown/CinnamonRolls.md",
+    "pdf_printed/thai-basil-chicken.pdf",
+    "pdf_printed/tamale_pie.pdf",
+    "pdf_printed/Rhubarb.Strawberry.Blackberry.Cobbler.pdf",
+    "pdf_printed/pot_pie_chicken.pdf",
+    "pdf_printed/Pizza_Dough.pdf",
+    "pdf_printed/perfect-pancakes.pdf",
+    "pdf_printed/new_recipe.pdf",
+    "pdf_printed/meatloaf.pdf",
+    "pdf_printed/keto-strawberry-shortcake.pdf",
+    "pdf_printed/homemade-pizza-dough.pdf",
+    "pdf_printed/green-goddess-salad.pdf",
+    "markdown/banana_bread.md",
+    "markdown/Pizza_Dough.md",
     "markdown/carrot_salad.md",
-    "markdown/brussel_sprouts.md",
-    "markdown/calzone.md",
     "markdown/tamale_pie.md",
-    "markdown/pot_pie_chicken.md",
+    "markdown/meatloaf.md",
+    "markdown/calzone.md",
     "markdown/Rhubarb.Strawberry.Blackberry.Cobbler.md",
+    "markdown/pot_pie_chicken.md",
+    "markdown/homemade-pizza-dough.md",
+    "markdown/garlic-herb-bread.md",
+    "markdown/thai-basil-chicken.md",
+    "markdown/new_recipe.md",
+    "markdown/chocolate-chip-cookies.md",
     "markdown/Apple_Crisp_w_Oat_topping.md",
-    "Welcome.md",
-    "reciep.md"
+    "markdown/keto-strawberry-shortcake.md",
+    "markdown/chocolate-avocado-mousse.md",
+    "markdown/green-goddess-salad.md",
+    "markdown/brussel_sprouts.md",
+    "markdown/dutch_baby.md",
+    "markdown/CinnamonRolls.md",
+    "markdown/perfect-pancakes.md",
+    "markdown/Test-new_recipe.md",
+    "markdown/Baking-homemade-pizza-dough.md",
+    "markdown/Dessert-keto-strawberry-shortcake.md",
+    "markdown/Main-thai-basil-chicken.md"
   ]
 }

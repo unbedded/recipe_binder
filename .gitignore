@@ -77,3 +77,4 @@ dmypy.json
 # Recipe Binder - Generated files (keep source markdown for demos)
 recipe/yaml/
 recipe/pdf/
+recipe/pdf_printed/

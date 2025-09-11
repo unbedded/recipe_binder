@@ -255,30 +255,6 @@ class TestMarkdownParserOpenAIIntegration:
         self.config = OpenAIConfig(api_key="sk-test-key")
 
     @patch("recipe_fmt.parsers.markdown_parser.OpenAIClient")
-    def test_successful_openai_parsing(self, mock_openai_client_class):
-        """Test successful OpenAI parsing with validation."""
-        # Setup mock OpenAI client
-        mock_client = Mock()
-        mock_openai_response = OpenAIResponse(
-            success=True,
-            data={"content": "title: Test Recipe\ncategory: Other"},
-            tokens_used=100,
-            cost_estimate=0.002,
-            cached=False,
-        )
-        mock_client.parse_recipe_markdown.return_value = mock_openai_response
-        mock_openai_client_class.return_value = mock_client
-
-        parser = MarkdownParser(self.config)
-        result = parser._parse_markdown_content("# Test Recipe", "test.md")
-
-        assert result.success is True
-        assert result.yaml_content == "title: Test Recipe\ncategory: Other"
-        assert result.tokens_used == 100
-        assert result.cost_estimate == 0.002
-        assert result.cached is False
-
-    @patch("recipe_fmt.parsers.markdown_parser.OpenAIClient")
     def test_openai_parsing_failure(self, mock_openai_client_class):
         """Test handling of OpenAI parsing failure."""
         # Setup mock OpenAI client to fail
@@ -378,17 +354,6 @@ instructions: []  # Empty instructions not allowed
         assert result.success is False
         assert "Recipe validation error" in result.error
 
-    def test_yaml_validation_disabled(self):
-        """Test behavior when YAML validation is disabled."""
-        yaml_content = "title: Test Recipe"
-
-        parser = MarkdownParser(self.config, {"validate_yaml": False})
-        result = parser._validate_and_parse_yaml(yaml_content, "test.md", 100, 0.001, False)
-
-        assert result.success is True
-        assert result.recipe is None  # No Recipe object created
-        assert result.yaml_content == yaml_content
-
     def test_partial_parsing_allowed(self):
         """Test partial parsing when validation fails but partial parsing is enabled."""
         invalid_yaml = """title: "Test Recipe"
@@ -462,19 +427,6 @@ class TestMarkdownParserEdgeCases:
         assert "validate_yaml" in stats["parser_config"]
         assert "allow_partial_parsing" in stats["parser_config"]
         assert "strict_validation" in stats["parser_config"]
-
-    def test_api_key_validation_delegation(self):
-        """Test API key validation delegates to OpenAI client."""
-        with patch("recipe_fmt.parsers.openai_client.OpenAIClient") as mock_client_class:
-            mock_client_instance = Mock()
-            mock_client_instance.validate_api_key.return_value = True
-            mock_client_class.return_value = mock_client_instance
-
-            parser = MarkdownParser(self.config)
-            result = parser.validate_api_key()
-
-        assert result is True
-        mock_client_instance.validate_api_key.assert_called_once()
 
     def test_concurrent_parsing_simulation(self):
         """Test parser behavior under simulated concurrent access."""

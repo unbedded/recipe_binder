@@ -229,9 +229,16 @@ class RecipePipeline:
                 result["errors"].append(f"OpenAI parsing failed: {parse_result.error}")
                 return result
 
-            # STEP_13: Get corresponding YAML file path
+            # STEP_13: Get corresponding YAML file path (simple naming)
             yaml_file = self.file_manager.get_corresponding_yaml_path(md_file)
-            yaml_file.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                yaml_file.parent.mkdir(parents=True, exist_ok=True)
+            except (OSError, TypeError) as e:
+                # Handle potential race conditions or permission issues in temp directories
+                if not yaml_file.parent.exists():
+                    self.logger.error("Failed to create directory %s: %s", yaml_file.parent, e)
+                    raise
+                # Directory exists, continue
 
             # STEP_14: Validate parsed YAML
             if parse_result.yaml_content:
@@ -378,10 +385,16 @@ class RecipePipeline:
 
                 generator = create_generator(show_weights=True)
 
-            # STEP_20: Determine PDF file path with category prefix
-            category = recipe.category
-            pdf_file = self.file_manager.get_corresponding_pdf_path(yaml_file, category)
-            pdf_file.parent.mkdir(parents=True, exist_ok=True)
+            # STEP_20: Determine PDF file path (simple naming)
+            pdf_file = self.file_manager.get_corresponding_pdf_path(yaml_file)
+            try:
+                pdf_file.parent.mkdir(parents=True, exist_ok=True)
+            except (OSError, TypeError) as e:
+                # Handle potential race conditions or permission issues in temp directories
+                if not pdf_file.parent.exists():
+                    self.logger.error("Failed to create directory %s: %s", pdf_file.parent, e)
+                    raise
+                # Directory exists, continue
 
             # STEP_21: Generate PDF
             generation_result = generator.generate_card(recipe, pdf_file)

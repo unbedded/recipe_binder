@@ -25,13 +25,13 @@ def main() -> None:
 Examples:
   # Enhance single recipe
   python -m recipe_fmt.nutrition recipe.yaml
-  
+
   # Enhance multiple recipes
   python -m recipe_fmt.nutrition recipe/yaml/*.yaml
-  
+
   # Use custom API key
   python -m recipe_fmt.nutrition --api-key YOUR_KEY recipe.yaml
-  
+
   # Dry run (show what would be calculated)
   python -m recipe_fmt.nutrition --dry-run recipe.yaml
         """,

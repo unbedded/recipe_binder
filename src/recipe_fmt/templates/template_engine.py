@@ -276,9 +276,9 @@ class TemplateEngine:
                     raise TemplateError("Invalid template format: expected dictionary at root")
 
             except yaml.YAMLError as e:
-                raise TemplateError(f"YAML parsing error in {template_path}: {e}")
+                raise TemplateError(f"YAML parsing error in {template_path}: {e}") from e
             except Exception as e:
-                raise TemplateError(f"Failed to read template {template_path}: {e}")
+                raise TemplateError(f"Failed to read template {template_path}: {e}") from e
 
             # STEP_8: Parse template data
             template = self._parse_template_data(template_data, template_path)
@@ -298,7 +298,7 @@ class TemplateEngine:
         except TemplateError:
             raise
         except Exception as e:
-            raise TemplateError(f"Unexpected error loading template {template_name}: {e}")
+            raise TemplateError(f"Unexpected error loading template {template_name}: {e}") from e
 
     def _parse_template_data(self, data: dict, source_path: Path) -> CardTemplate:
         """Parse template data into CardTemplate object.
@@ -404,7 +404,7 @@ class TemplateEngine:
             return template
 
         except Exception as e:
-            raise TemplateError(f"Failed to parse template data: {e}")
+            raise TemplateError(f"Failed to parse template data: {e}") from e
 
     def _parse_typography_style(self, style_data: dict, default_style: TypographyStyle) -> TypographyStyle:
         """Parse typography style data.

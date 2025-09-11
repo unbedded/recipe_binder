@@ -513,7 +513,8 @@ class TestPipelineIntegrationConfiguration:
                 mock_client = Mock()
                 mock_client.parse_recipe_markdown.return_value = OpenAIResponse(
                     success=True,
-                    data={"content": """title: Rebuilt Recipe
+                    data={
+                        "content": """title: Rebuilt Recipe
 category: Other
 servings: 1
 ingredients:
@@ -521,7 +522,8 @@ ingredients:
     amount: 1
     unit: cup
 instructions:
-  - Mix ingredients"""},
+  - Mix ingredients"""
+                    },
                     tokens_used=50,
                     cost_estimate=0.001,
                 )

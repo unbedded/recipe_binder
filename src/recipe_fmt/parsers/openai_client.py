@@ -445,7 +445,8 @@ Extract from "Notes", "Tips", "Variations" sections or recipe comments:
 - Preserve important cooking details (temperatures, times, techniques)
 
 ## RESPONSE FORMAT
-Return ONLY the YAML output. Do not include code blocks, explanations, or additional text. Start directly with the YAML content."""
+Return ONLY the YAML output. Do not include code blocks, explanations, or additional text.
+Start directly with the YAML content."""
 
     def validate_api_key(self) -> bool:
         """Validate that the OpenAI API key is working.

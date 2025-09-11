@@ -155,7 +155,7 @@ class NutritionCalculator:
 
             # Add to totals (skip N/A values)
             for key, value in nutrition.items():
-                if value != "N/A" and isinstance(value, (int, float)):
+                if value != "N/A" and isinstance(value, int | float):
                     total[key] += value
 
         return total

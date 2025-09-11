@@ -105,7 +105,7 @@ class TestPDFCardGeneratorInitialization:
 
         assert generator.config == config
         assert generator.cfg_dict["card_layout"] == CardLayout.TWO_SIDED
-        assert generator.cfg_dict["print_margins"] == 0.25
+        # print_margins config removed - now uses fixed 0.375" margins
         assert generator.cfg_dict["show_category_banner"] is True
 
     @patch("recipe_fmt.generators.pdf_generator.REPORTLAB_AVAILABLE", False)
@@ -144,16 +144,20 @@ class TestPDFCardGeneratorInitialization:
         config = DisplayConfig()
         generator = PDFCardGenerator(config)
 
-        # Check card dimensions (8.5" × 4")
+        # Check card dimensions (8.5" × 11" portrait)
         expected_width = 8.5 * 72  # 72 points per inch
-        expected_height = 4.0 * 72
+        expected_height = 11.0 * 72
 
         assert generator.card_width == expected_width
         assert generator.card_height == expected_height
 
-        # Check margins
-        expected_margin = 0.25 * 72  # Default margin
-        assert generator.margin == expected_margin
+        # Check fixed margins
+        expected_side_margin = 0.375 * 72  # Side margins: 0.375"
+        expected_top_margin = 0.15 * 72  # Top margin: 0.15"
+        expected_bottom_margin = 0.375 * 72  # Bottom margin: 0.375"
+        assert generator.side_margin == expected_side_margin
+        assert generator.top_margin == expected_top_margin
+        assert generator.bottom_margin == expected_bottom_margin
 
     @patch("recipe_fmt.generators.pdf_generator.REPORTLAB_AVAILABLE", True)
     def test_typography_initialization(self):
@@ -224,9 +228,11 @@ class TestPDFCardGeneratorGeneration:
         generator = PDFCardGenerator(self.config)
 
         # Mock filesystem operations for testing
-        with patch.object(Path, "mkdir"), \
-             patch.object(Path, "stat") as mock_stat, \
-             patch.object(Path, "is_dir", return_value=True):
+        with (
+            patch.object(Path, "mkdir"),
+            patch.object(Path, "stat") as mock_stat,
+            patch.object(Path, "is_dir", return_value=True),
+        ):
             from types import SimpleNamespace
 
             mock_stat.return_value = SimpleNamespace(st_size=15000)  # 15KB file
@@ -277,9 +283,11 @@ class TestPDFCardGeneratorGeneration:
             cfg_dict = {"card_layout": layout}
             generator = PDFCardGenerator(self.config, cfg_dict)
 
-            with patch.object(Path, "mkdir"), \
-                 patch.object(Path, "stat") as mock_stat, \
-                 patch.object(Path, "is_dir", return_value=True):
+            with (
+                patch.object(Path, "mkdir"),
+                patch.object(Path, "stat") as mock_stat,
+                patch.object(Path, "is_dir", return_value=True),
+            ):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=10000)
@@ -333,10 +341,10 @@ class TestPDFCardGeneratorContentBuilding:
 
         # Mock the required ReportLab components
         with (
-            patch("recipe_fmt.generators.pdf_generator.Paragraph"),
-            patch("recipe_fmt.generators.pdf_generator.Spacer"),
+            patch("recipe_fmt.generators.pdf.builders.header_builder.Paragraph"),
+            patch("recipe_fmt.generators.pdf.builders.header_builder.Spacer"),
         ):
-            header_content = generator._build_header_section(self.test_recipe)
+            header_content = generator.header_builder.build_header_section(self.test_recipe)
 
         # Should return a list of flowables
         assert isinstance(header_content, list)
@@ -348,10 +356,10 @@ class TestPDFCardGeneratorContentBuilding:
         generator = PDFCardGenerator(self.config)
 
         with (
-            patch("recipe_fmt.generators.pdf_generator.Paragraph"),
-            patch("recipe_fmt.generators.pdf_generator.Table"),
+            patch("recipe_fmt.generators.pdf.builders.ingredients_builder.Table"),
+            patch("recipe_fmt.generators.pdf.builders.ingredients_builder.TableStyle"),
         ):
-            ingredients_content = generator._build_ingredients_section(self.test_recipe)
+            ingredients_content = generator.ingredients_builder.build_ingredients_section(self.test_recipe)
 
         assert isinstance(ingredients_content, list)
         assert len(ingredients_content) > 0
@@ -361,8 +369,8 @@ class TestPDFCardGeneratorContentBuilding:
         """Test instructions section content building."""
         generator = PDFCardGenerator(self.config)
 
-        with patch("recipe_fmt.generators.pdf_generator.Paragraph"):
-            instructions_content = generator._build_instructions_section(self.test_recipe)
+        with patch("recipe_fmt.generators.pdf.builders.instructions_builder.Paragraph"):
+            instructions_content = generator.instructions_builder.build_instructions_section(self.test_recipe)
 
         assert isinstance(instructions_content, list)
         assert len(instructions_content) > 0
@@ -372,8 +380,8 @@ class TestPDFCardGeneratorContentBuilding:
         """Test notes section content building."""
         generator = PDFCardGenerator(self.config)
 
-        with patch("recipe_fmt.generators.pdf_generator.Paragraph"):
-            notes_content = generator._build_notes_section(self.test_recipe)
+        with patch("recipe_fmt.generators.pdf.builders.notes_builder.Paragraph"):
+            notes_content = generator.notes_builder.build_notes_section(self.test_recipe)
 
         assert isinstance(notes_content, list)
         assert len(notes_content) > 0
@@ -404,7 +412,7 @@ class TestPDFCardGeneratorConfiguration:
 
         cfg = generator.get_cfg()
         assert cfg["card_layout"] == CardLayout.TWO_SIDED
-        assert cfg["print_margins"] == 0.25
+        # print_margins config removed - now uses fixed margins
         assert cfg["ingredient_columns"] == 3
         assert cfg["show_category_banner"] is True
         assert cfg["quality"] == "high"
@@ -473,9 +481,11 @@ class TestPDFCardGeneratorEdgeCases:
             generator = PDFCardGenerator(self.config)
             output_path = Path(self.temp_dir) / "empty.pdf"
 
-            with patch.object(Path, "mkdir"), \
-                 patch.object(Path, "stat") as mock_stat, \
-                 patch.object(Path, "is_dir", return_value=True):
+            with (
+                patch.object(Path, "mkdir"),
+                patch.object(Path, "stat") as mock_stat,
+                patch.object(Path, "is_dir", return_value=True),
+            ):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=1000)
@@ -502,9 +512,11 @@ class TestPDFCardGeneratorEdgeCases:
             generator = PDFCardGenerator(self.config)
             output_path = Path(self.temp_dir) / "long_title.pdf"
 
-            with patch.object(Path, "mkdir"), \
-                 patch.object(Path, "stat") as mock_stat, \
-                 patch.object(Path, "is_dir", return_value=True):
+            with (
+                patch.object(Path, "mkdir"),
+                patch.object(Path, "stat") as mock_stat,
+                patch.object(Path, "is_dir", return_value=True),
+            ):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=2000)
@@ -531,9 +543,11 @@ class TestPDFCardGeneratorEdgeCases:
             generator = PDFCardGenerator(self.config)
             output_path = Path(self.temp_dir) / "unicode.pdf"
 
-            with patch.object(Path, "mkdir"), \
-                 patch.object(Path, "stat") as mock_stat, \
-                 patch.object(Path, "is_dir", return_value=True):
+            with (
+                patch.object(Path, "mkdir"),
+                patch.object(Path, "stat") as mock_stat,
+                patch.object(Path, "is_dir", return_value=True),
+            ):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=3000)
@@ -570,9 +584,11 @@ class TestPDFCardGeneratorEdgeCases:
             generator = PDFCardGenerator(self.config)
             output_path = Path(self.temp_dir) / "many_ingredients.pdf"
 
-            with patch.object(Path, "mkdir"), \
-                 patch.object(Path, "stat") as mock_stat, \
-                 patch.object(Path, "is_dir", return_value=True):
+            with (
+                patch.object(Path, "mkdir"),
+                patch.object(Path, "stat") as mock_stat,
+                patch.object(Path, "is_dir", return_value=True),
+            ):
                 from types import SimpleNamespace
 
                 mock_stat.return_value = SimpleNamespace(st_size=20000)
@@ -662,9 +678,11 @@ class TestPDFCardGeneratorIntegration:
         generator = PDFCardGenerator(self.config)
         output_path = Path(self.temp_dir) / "comprehensive.pdf"
 
-        with patch.object(Path, "mkdir"), \
-             patch.object(Path, "stat") as mock_stat, \
-             patch.object(Path, "is_dir", return_value=True):
+        with (
+            patch.object(Path, "mkdir"),
+            patch.object(Path, "stat") as mock_stat,
+            patch.object(Path, "is_dir", return_value=True),
+        ):
             from types import SimpleNamespace
 
             mock_stat.return_value = SimpleNamespace(st_size=25000)
@@ -703,9 +721,11 @@ class TestPDFCardGeneratorIntegration:
                 generator = PDFCardGenerator(self.config, cfg_dict)
                 output_path = Path(self.temp_dir) / f"{layout.value}.pdf"
 
-                with patch.object(Path, "mkdir"), \
-                     patch.object(Path, "stat") as mock_stat, \
-                     patch.object(Path, "is_dir", return_value=True):
+                with (
+                    patch.object(Path, "mkdir"),
+                    patch.object(Path, "stat") as mock_stat,
+                    patch.object(Path, "is_dir", return_value=True),
+                ):
                     from types import SimpleNamespace
 
                     mock_stat.return_value = SimpleNamespace(st_size=10000)

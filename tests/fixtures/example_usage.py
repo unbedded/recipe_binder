@@ -11,10 +11,6 @@ Run this script to see the fixtures in action:
 import sys
 from pathlib import Path
 
-# Add project root to path for imports
-project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 # Import fixtures and sample data
 from tests.fixtures import (
     DEFAULT_CARD_TEMPLATE,
@@ -89,9 +85,9 @@ def demonstrate_template_data():
 
     # Get template by name
     compact_template = get_template_data("compact_card")
-    print(
-        f"\nCompact template dimensions: {compact_template['card']['size']['width']}x{compact_template['card']['size']['height']}"
-    )
+    width = compact_template["card"]["size"]["width"]
+    height = compact_template["card"]["size"]["height"]
+    print(f"\nCompact template dimensions: {width}x{height}")
 
     # List valid and invalid template names
     valid_names = get_valid_template_names()
@@ -309,6 +305,10 @@ def demonstrate_parameterized_testing():
 
 def main():
     """Run all demonstrations."""
+    # Add project root to path for imports
+    project_root = Path(__file__).parent.parent.parent
+    sys.path.insert(0, str(project_root))
+
     print("Recipe Binder Test Fixtures Demo")
     print("=" * 40)
 

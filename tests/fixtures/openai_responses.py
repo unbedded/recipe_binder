@@ -152,7 +152,7 @@ source: "Family Recipe Collection"
             "In a separate bowl, whisk buttermilk, eggs, and melted butter until combined.",
             "Pour wet ingredients into dry ingredients and stir until just combined. Don't overmix - lumps are okay.",
             "Heat a griddle or large skillet over medium heat. Lightly grease with butter or oil.",
-            "Pour 1/4 cup batter for each pancake. Cook until bubbles form on surface and edges look set, about 2-3 minutes.",
+            "Pour 1/4 cup batter for each pancake. Cook until bubbles form on surface and edges look set, 2-3 minutes.",
             "Flip and cook until golden brown on other side, 1-2 minutes more.",
             "Serve immediately with butter and maple syrup.",
         ],
@@ -299,7 +299,10 @@ NO_YAML_MARKERS_RESPONSE = {
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": "I'm sorry, but I cannot parse this recipe as it seems to be incomplete or malformed. Please provide a properly formatted recipe with clear ingredients and instructions.",
+                    "content": (
+                        "I'm sorry, but I cannot parse this recipe as it seems to be incomplete or malformed. "
+                        "Please provide a properly formatted recipe with clear ingredients and instructions."
+                    ),
                 },
                 "finish_reason": "stop",
             }
@@ -311,7 +314,50 @@ NO_YAML_MARKERS_RESPONSE = {
     "cost_estimate": 0.00345,
 }
 
+
 # Very Large Response - For testing limits
+def _build_large_recipe_content():
+    """Build large recipe content to avoid long lines."""
+    # Build ingredients list
+    ingredients_list = []
+    for i in range(1, 101):
+        ingredient_entry = f'  - ingredient: "ingredient_{i}"\n    amount: {i}.0\n    unit: "unit_{i}"'
+        ingredients_list.append(ingredient_entry)
+    ingredients_yaml = chr(10).join(ingredients_list)
+
+    # Build instructions list
+    instructions_list = []
+    for i in range(1, 151):
+        instruction = (
+            f'  - "Step {i}: Very detailed instruction with lots of explanation '
+            f'about technique, timing, and what to look for during this step of the cooking process."'
+        )
+        instructions_list.append(instruction)
+    instructions_yaml = chr(10).join(instructions_list)
+
+    # Build notes and tags
+    notes_yaml = chr(10).join([f'  - "Note {i}: Additional information and tips"' for i in range(1, 51)])
+    tags_yaml = chr(10).join([f'  - "tag_{i}"' for i in range(1, 21)])
+
+    return f"""```yaml
+title: "Complex Multi-Course Meal"
+category: "Other"
+description: "A very complex recipe with many steps and ingredients"
+prep_time_minutes: 180
+cook_time_minutes: 240
+servings: 20
+difficulty: "Hard"
+ingredients:
+{ingredients_yaml}
+instructions:
+{instructions_yaml}
+notes:
+{notes_yaml}
+tags:
+{tags_yaml}
+```"""
+
+
 LARGE_RECIPE_RESPONSE = {
     "raw_response": {
         "id": "chatcmpl-large123",
@@ -323,23 +369,7 @@ LARGE_RECIPE_RESPONSE = {
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": f"""```yaml
-title: "Complex Multi-Course Meal"
-category: "Other"
-description: "A very complex recipe with many steps and ingredients"
-prep_time_minutes: 180
-cook_time_minutes: 240
-servings: 20
-difficulty: "Hard"
-ingredients:
-{chr(10).join([f'  - ingredient: "ingredient_{i}"' + chr(10) + f"    amount: {i}.0" + chr(10) + f'    unit: "unit_{i}"' for i in range(1, 101)])}
-instructions:
-{chr(10).join([f'  - "Step {i}: Very detailed instruction with lots of explanation about technique, timing, and what to look for during this step of the cooking process."' for i in range(1, 151)])}
-notes:
-{chr(10).join([f'  - "Note {i}: Additional information and tips"' for i in range(1, 51)])}
-tags:
-{chr(10).join([f'  - "tag_{i}"' for i in range(1, 21)])}
-```""",
+                    "content": _build_large_recipe_content(),
                 },
                 "finish_reason": "stop",
             }

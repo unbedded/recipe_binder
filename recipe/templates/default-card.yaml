@@ -64,7 +64,7 @@ typography:
 
   ingredient:
     font_name: "Helvetica"
-    font_size: 9
+    font_size: 11
     alignment: "left"
     color: "black"
     space_after: 2
@@ -94,21 +94,23 @@ display:
 
   # Ingredient table configuration
   ingredients:
+    layout: "two_column"  # Options: "single_table", "two_column"
+
     columns:
       amount:
-        width: 0.8  # inches
+        width: 0.6  # inches (reduced for two-column layout)
         alignment: "right"
         label: "Amount"
       unit:
-        width: 0.8  # inches
+        width: 0.6  # inches (reduced for two-column layout)
         alignment: "right"
         label: "Unit"
       ingredient:
-        width: "auto"  # Uses remaining space
+        width: "auto"  # Uses remaining space (much larger now!)
         alignment: "left"
         label: "Ingredient"
       weight:
-        width: 0.8  # inches
+        width: 0.7  # inches (reduced for two-column layout)
         alignment: "center"
         label: "Weight"
         format: "({weight}g)"

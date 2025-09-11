@@ -42,7 +42,7 @@ SAMPLE_PANCAKES = Recipe(
         "In a separate bowl, whisk buttermilk, eggs, and melted butter until combined.",
         "Pour wet ingredients into dry ingredients and stir until just combined. Don't overmix - lumps are okay.",
         "Heat a griddle or large skillet over medium heat. Lightly grease with butter or oil.",
-        "Pour 1/4 cup batter for each pancake. Cook until bubbles form on surface and edges look set, about 2-3 minutes.",
+        "Pour 1/4 cup batter for each pancake. Cook until bubbles form on surface and edges look set, 2-3 minutes.",
         "Flip and cook until golden brown on other side, 1-2 minutes more.",
         "Serve immediately with butter and maple syrup.",
     ],

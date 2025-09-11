@@ -8,9 +8,9 @@ import json
 import logging
 import shutil
 import tempfile
-from contextlib import contextmanager
+from contextlib import AbstractContextManager, contextmanager
 from pathlib import Path
-from typing import Any, ContextManager
+from typing import Any
 
 import yaml
 
@@ -362,7 +362,7 @@ class MockFileSystem:
 
 
 @contextmanager
-def temporary_recipe_files(recipes: dict[str, str]) -> ContextManager[dict[str, Path]]:
+def temporary_recipe_files(recipes: dict[str, str]) -> AbstractContextManager[dict[str, Path]]:
     """Context manager for temporary recipe files.
 
     Args:
@@ -379,7 +379,7 @@ def temporary_recipe_files(recipes: dict[str, str]) -> ContextManager[dict[str, 
 @contextmanager
 def temporary_template_files(
     templates: dict[str, dict[str, Any]],
-) -> ContextManager[dict[str, Path]]:
+) -> AbstractContextManager[dict[str, Path]]:
     """Context manager for temporary template files.
 
     Args:
@@ -559,7 +559,7 @@ class FileSystemTestHelper:
             with open(file_path, encoding="utf-8") as f:
                 return yaml.safe_load(f)
         except yaml.YAMLError as e:
-            raise AssertionError(f"Invalid YAML in {file_path}: {e}")
+            raise AssertionError(f"Invalid YAML in {file_path}: {e}") from e
 
     @staticmethod
     def get_file_modification_time(file_path: Path) -> float:

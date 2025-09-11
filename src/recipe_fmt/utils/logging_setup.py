@@ -160,6 +160,7 @@ class ThreadSafeFileHandler(logging.handlers.RotatingFileHandler):
     """
 
     def __init__(self, *args, **kwargs):
+        """Initialize thread-safe file handler."""
         super().__init__(*args, **kwargs)
         # Use a lock for thread safety
         self.lock = logging._lock
