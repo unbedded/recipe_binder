@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""<DATE>2025-09-08</DATE>
+"""<DATE>2025-09-08</DATE>.
 
 C++ project bootstrap tool using template system.
 
@@ -256,7 +256,7 @@ target_include_directories({self.cfg_dict["package_name"]} INTERFACE
             package_name = self.cfg_dict["package_name"]
 
             # TODO: Create header file template
-            header_content = f'''#pragma once
+            header_content = f"""#pragma once
 // TODO: Implement comprehensive header file template
 // <DATE>2025-09-08</DATE>
 
@@ -264,10 +264,10 @@ target_include_directories({self.cfg_dict["package_name"]} INTERFACE
  * @file {package_name}.hpp
  * @brief Main header for {package_name} library
  * @author {self.cfg_dict["author"]}
- * 
+ *
  * This header provides the main interface for the {package_name} library
  * following modern C++ practices and CLAUDE.md standards.
- * 
+ *
  * TODO: Add the following:
  * 1. Proper namespace organization
  * 2. Class/function declarations
@@ -275,11 +275,11 @@ target_include_directories({self.cfg_dict["package_name"]} INTERFACE
  * 4. Comprehensive documentation
  * 5. Include necessary standard library headers
  * 6. Forward declarations where appropriate
- * 
+ *
  * Example usage:
  * ```cpp
  * #include "{package_name}/{package_name}.hpp"
- * 
+ *
  * int main() {{
  *     {package_name}::SampleClass obj;
  *     return 0;
@@ -294,13 +294,13 @@ namespace {package_name} {{
 
     // TODO: Add version constants
     constexpr int VERSION_MAJOR = 0;
-    constexpr int VERSION_MINOR = 1; 
+    constexpr int VERSION_MINOR = 1;
     constexpr int VERSION_PATCH = 0;
-    
+
     // TODO: Add main class/function declarations
-    
+
 }} // namespace {package_name}
-'''
+"""
 
             header_dir = Path(f"include/{package_name}")
             header_file = header_dir / f"{package_name}.hpp"
@@ -308,7 +308,7 @@ namespace {package_name} {{
 
             # TODO: Create source file if not header-only
             if not self.cfg_dict["header_only"]:
-                src_content = f'''// TODO: Implement source file template
+                src_content = f"""// TODO: Implement source file template
 // <DATE>2025-09-08</DATE>
 
 /**
@@ -331,7 +331,7 @@ namespace {package_name} {{
     // TODO: Add implementations
 
 }} // namespace {package_name}
-'''
+"""
 
                 src_file = Path(f"src/{package_name}.cpp")
                 src_file.write_text(src_content)
@@ -364,7 +364,7 @@ namespace {package_name} {{
 
             # TODO: Create test file template based on framework
             if test_framework == "gtest":
-                test_content = f'''// TODO: Implement Google Test template
+                test_content = f"""// TODO: Implement Google Test template
 // <DATE>2025-09-08</DATE>
 
 /**
@@ -389,9 +389,9 @@ protected:
     void SetUp() override {{
         // TODO: Setup test environment
     }}
-    
+
     void TearDown() override {{
-        // TODO: Cleanup test environment  
+        // TODO: Cleanup test environment
     }}
 }};
 
@@ -411,9 +411,9 @@ int main(int argc, char** argv) {{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }}
-'''
+"""
             elif test_framework == "catch2":
-                test_content = f'''// TODO: Implement Catch2 template
+                test_content = f"""// TODO: Implement Catch2 template
 // <DATE>2025-09-08</DATE>
 
 #define CATCH_CONFIG_MAIN
@@ -430,7 +430,7 @@ TEST_CASE("{package_name} edge cases", "[{package_name}]") {{
     // TODO: Add edge case tests
     REQUIRE(true); // Placeholder
 }}
-'''
+"""
             else:
                 test_content = f"// TODO: Implement test template for {test_framework}"
 
@@ -518,9 +518,7 @@ CMakeToolchain
             True if successful
         """
         self.logger.info("Starting C++ project bootstrap (TODO: Placeholder implementation)")
-        print(
-            f"⚡ Bootstrapping C++ project: {self.cfg_dict['package_name']} (TODO: Not fully implemented)"
-        )
+        print(f"⚡ Bootstrapping C++ project: {self.cfg_dict['package_name']} (TODO: Not fully implemented)")
 
         steps = [
             ("Create directory structure", self.create_cpp_directory_structure),

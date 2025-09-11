@@ -25,6 +25,7 @@ dependencies = [
     "PyYAML>=6.0",
     "pathlib-mate>=1.0",
     "typing-extensions>=4.0",
+    "requests>=2.25.0",
 ]
 
 [project.optional-dependencies]
@@ -79,7 +80,7 @@ omit = [
 
 [tool.ruff]
 target-version = "py313"
-line-length = 100
+line-length = 120
 fix = true
 
 [tool.ruff.lint]
@@ -129,7 +130,7 @@ warn_return_any = false
 warn_unused_ignores = false
 
 [tool.black]
-line-length = 100
+line-length = 120
 target-version = ["py313"]
 include = '\.pyi?$'
 extend-exclude = '''

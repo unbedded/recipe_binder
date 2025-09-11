@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""<DATE>2025-09-08</DATE>
+"""<DATE>2025-09-08</DATE>.
 
 Common bootstrap utilities for project template setup.
 
@@ -229,9 +229,7 @@ class ProjectBootstrapper:
             gitignore_content = "\n".join(common_patterns + language_patterns)
 
             Path(".gitignore").write_text(gitignore_content)
-            self.logger.info(
-                "Created .gitignore with %d patterns", len(common_patterns + language_patterns)
-            )
+            self.logger.info("Created .gitignore with %d patterns", len(common_patterns + language_patterns))
             print("✅ Created .gitignore file")
             return True
 
@@ -302,7 +300,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Nothing yet
 
-### Deprecated  
+### Deprecated
 - Nothing yet
 
 ### Removed
@@ -395,9 +393,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
             file_path.write_text(content)
 
-            self.logger.debug(
-                "Replaced placeholders in %s: %s", file_path, list(replacements.keys())
-            )
+            self.logger.debug("Replaced placeholders in %s: %s", file_path, list(replacements.keys()))
             return True
 
         except Exception as e:

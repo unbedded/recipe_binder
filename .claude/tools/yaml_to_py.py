@@ -12,6 +12,7 @@ import yaml  # requires PyYAML
 
 
 def main() -> int:
+    """Convert YAML file to Python dictionary format."""
     if len(sys.argv) != 3:
         print("Usage: python tools/yaml_to_py.py <input.yaml> <output.py>", file=sys.stderr)
         return 2

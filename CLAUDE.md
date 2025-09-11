@@ -37,6 +37,42 @@
 - Validate all inputs and sanitize user-provided data.
 - Use secure defaults and fail securely.
 
+## Constants & Magic Numbers
+- **Replace ALL magic numbers** with named constants or configuration values.
+- Use **ALL_CAPS** for module-level constants: `LOGO_WIDTH_INCHES = 0.8`
+- Group related constants into dataclasses or configuration objects.
+- Prefer configuration injection over hardcoded values, especially for shared constants.
+- Document relationships between constants and their usage.
+
+**Examples:**
+```python
+# BAD: Magic numbers scattered throughout code
+logo_image = Image(path, width=0.8 * inch, height=0.25 * inch)
+nutrition_width = content_width * 0.20
+spacer = Spacer(1, 0.1 * inch)
+
+# GOOD: Named constants at module level
+LOGO_WIDTH_INCHES = 0.8
+LOGO_HEIGHT_INCHES = 0.25
+NUTRITION_COLUMN_RATIO = 0.20
+DEFAULT_SPACER_INCHES = 0.1
+
+# BETTER: Grouped configuration objects for shared constants
+@dataclass
+class LayoutConstants:
+    logo_width_inches: float = 0.8
+    logo_height_inches: float = 0.25
+    nutrition_column_ratio: float = 0.20
+    ingredient_column_ratio: float = 0.44
+    default_spacer_inches: float = 0.1
+```
+
+**Shared Constants Architecture:**
+- Create shared configuration classes for cross-module constants
+- Use dependency injection to pass configuration objects to constructors
+- Validate configuration values with Pydantic validators
+- Avoid duplicating constants across modules
+
 ## Configuration Management
 - Use **Pydantic Settings** for type-safe configuration with validation.
 - Support multiple config sources: environment variables, `.env` files, and direct instantiation.

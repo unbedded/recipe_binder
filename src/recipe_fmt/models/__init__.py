@@ -5,7 +5,7 @@ throughout the Recipe Binder pipeline.
 
 Example usage:
     from recipe_fmt.models import Recipe, Ingredient, AppConfig
-    
+
     # Create a recipe
     recipe = Recipe(
         title="Test Recipe",
@@ -13,20 +13,19 @@ Example usage:
         ingredients=[...],
         instructions=[...]
     )
-    
+
     # Load configuration
     config = AppConfig()
 """
 
-from .recipe import Recipe, Ingredient, Nutrition
-from .config import AppConfig, DisplayConfig, OpenAIConfig, TemplateConfig
+from .config import AppConfig, DisplayConfig, OpenAIConfig
+from .recipe import Ingredient, Nutrition, Recipe
 
 __all__ = [
-    'Recipe',
-    'Ingredient', 
-    'Nutrition',
-    'AppConfig',
-    'DisplayConfig',
-    'OpenAIConfig',
-    'TemplateConfig'
+    "Recipe",
+    "Ingredient",
+    "Nutrition",
+    "AppConfig",
+    "DisplayConfig",
+    "OpenAIConfig",
 ]

@@ -1,0 +1,225 @@
+{
+  "main": {
+    "id": "1498f88fa36f1f8f",
+    "type": "split",
+    "children": [
+      {
+        "id": "3849a5fbf9dec3f0",
+        "type": "tabs",
+        "dimension": 75.84033613445378,
+        "children": [
+          {
+            "id": "badb5a8c8e3645f7",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
+            }
+          }
+        ]
+      },
+      {
+        "id": "1118d6949130f6fc",
+        "type": "tabs",
+        "dimension": 24.159663865546218,
+        "children": [
+          {
+            "id": "def34500a3478e4a",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "439a4e3291202895",
+    "type": "split",
+    "children": [
+      {
+        "id": "54d59fff02262770",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d383ea0cada010a3",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "746c38c653baa5e7",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "9e19602aec7273dc",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "489fede2052c0bbb",
+    "type": "split",
+    "children": [
+      {
+        "id": "983b203ca8486f2e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b9f12539ed093fe4",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "reciep.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for reciep"
+            }
+          },
+          {
+            "id": "6dae2559f6b89bf0",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "reciep.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from reciep"
+            }
+          },
+          {
+            "id": "e637cfe11bcf6d46",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "332c4dd0af173ca0",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "reciep.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of reciep"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "d383ea0cada010a3",
+  "lastOpenFiles": [
+    "pdf_printed/thai-basil-chicken.pdf",
+    "pdf_printed/tamale_pie.pdf",
+    "pdf_printed/Rhubarb.Strawberry.Blackberry.Cobbler.pdf",
+    "pdf_printed/pot_pie_chicken.pdf",
+    "pdf_printed/Pizza_Dough.pdf",
+    "pdf_printed/perfect-pancakes.pdf",
+    "pdf_printed/new_recipe.pdf",
+    "pdf_printed/meatloaf.pdf",
+    "pdf_printed/keto-strawberry-shortcake.pdf",
+    "pdf_printed/homemade-pizza-dough.pdf",
+    "pdf_printed/green-goddess-salad.pdf",
+    "markdown/banana_bread.md",
+    "markdown/Pizza_Dough.md",
+    "markdown/carrot_salad.md",
+    "markdown/tamale_pie.md",
+    "markdown/meatloaf.md",
+    "markdown/calzone.md",
+    "markdown/Rhubarb.Strawberry.Blackberry.Cobbler.md",
+    "markdown/pot_pie_chicken.md",
+    "markdown/homemade-pizza-dough.md",
+    "markdown/garlic-herb-bread.md",
+    "markdown/thai-basil-chicken.md",
+    "markdown/new_recipe.md",
+    "markdown/chocolate-chip-cookies.md",
+    "markdown/Apple_Crisp_w_Oat_topping.md",
+    "markdown/keto-strawberry-shortcake.md",
+    "markdown/chocolate-avocado-mousse.md",
+    "markdown/green-goddess-salad.md",
+    "markdown/brussel_sprouts.md",
+    "markdown/dutch_baby.md",
+    "markdown/CinnamonRolls.md",
+    "markdown/perfect-pancakes.md",
+    "markdown/Test-new_recipe.md",
+    "markdown/Baking-homemade-pizza-dough.md",
+    "markdown/Dessert-keto-strawberry-shortcake.md",
+    "markdown/Main-thai-basil-chicken.md"
+  ]
+}
