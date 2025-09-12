@@ -105,7 +105,7 @@ This wasn't just corporate policy documentation - it is **AI training**. Every i
 
 ### Architecture First, Code Second
 
-Here's my proven approach:
+Of course the first line of code does not survive the battle with customer's feature creep and the technical unknown-unknowns - but at least you started out in an intelligent direction. Here's my effective approach:
 
 1. **Start with exploration** - Use ChatGPT to understand the problem space and get technology recommendations
 2. **Create your framework** - Build a `CLAUDE.md` with your coding policies and workflows
@@ -113,7 +113,7 @@ Here's my proven approach:
 4. **Architecture first** - Design the complete technical solution before coding
 5. **Establish standards upfront** - Define your quality gates, testing approach, and documentation requirements
 
-Of course the first line of code does not survive the battle with customer's feature creep and the technical unknown-unknowns - but at least you started out in an intelligent direction.
+This is not a RAG database - but I did heavy leveraged AI to clean data entries and make tag/keyword which is a critical step for creating RAG meta data for effective RAG post filtering.
 
 ```python
 # AI helped design this clean separation of concerns
