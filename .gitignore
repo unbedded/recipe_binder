@@ -78,3 +78,7 @@ dmypy.json
 recipe/yaml/
 recipe/pdf/
 recipe/pdf_printed/
+recipe/*.md
+recipe/*.png
+
+
